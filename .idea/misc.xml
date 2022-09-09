@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/drawable/ic_accomodation.xml" value="0.1815" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/drawable/ic_calendar.xml" value="0.1815" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/drawable/ic_category.xml" value="0.1815" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/drawable/ic_coin.xml" value="0.1815" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/drawable/ic_date.xml" value="0.1815" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/font/founders_regular.xml" value="0.3123076923076923" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/dropdown_item.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/expense_list_item.xml" value="0.29739583333333336" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/fragment_expense_form.xml" value="0.29739583333333336" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/fragment_expense_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/spinner_item.xml" value="0.33967391304347827" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
