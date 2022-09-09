@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.mexpense.R;
@@ -40,23 +41,18 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         mViewModel = new ViewModelProvider(this).get(ExpenseFormViewModel.class);
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
 
-        AutoCompleteTextView categoryView = binding.autoCompleteTextview;
+        AutoCompleteTextView categoryView = binding.inputTextCategories;
 
         String[] items = new String[]{"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical Expenses", "Printing"};
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, items);
-
         categoryView.setAdapter(adapter);
 
         TextInputEditText editDate = binding.inputTextDate;
+        Button saveButton = binding.btnSave;
 
+        saveButton.setOnClickListener(this);
         editDate.setOnClickListener(this);
-
-        categoryView.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                echoCategory();
-            }
-        });
+        categoryView.setOnClickListener(this);
 
         date = (datePicker, year, month, day) -> {
             myCalendar.set(Calendar.YEAR, year);
@@ -68,39 +64,61 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         return binding.getRoot();
     }
 
-//    private Expense getFormInput(){
-//        Optional<String> optional = mViewModel.expense.getValue.getId();
-//        int id;
-//        if(!optional.isPresent()) {
-//            id = Constants.NEW_EXPENSE;
-//        } else id = Integer.parseInt(optional.toString());
-//
-//        String name = binding.editTextName.getText().toString();
-//        String category = binding.editTextCategory.getText().toString();
-//        String destination = binding.editTextDestination.getText().toString();
-//        String date = binding.editTextDate.getText().toString();
-//        boolean assessment = binding.switchRequiredAssessment.getShowText();
-//        String description = binding.editTextDescription.getText().toString();
-//        double cost = Double.parseDouble(binding.editTextCost.getText().toString());
-//        return new Expense(id, name, category, destination, date, assessment, description, cost);
-//    }
-
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.btnSave:
+                if(validation()){
+                    addExpense();
+                }
+                break;
             case R.id.inputTextDate:
                 setDate();
                 break;
-            case R.id.autoCompleteTextview:
-                echoCategory();
             default:
                 break;
         }
     }
 
-    private void echoCategory(){
-        AutoCompleteTextView categoryView = binding.autoCompleteTextview;
-        Toast.makeText(getContext(), categoryView.getText().toString(), Toast.LENGTH_SHORT).show();
+    private boolean validation(){
+        if(binding.inputTextName.getText().toString() == ""){
+            makeToast("Please enter the expense's name");
+            return false;
+        }
+
+        if(binding.inputTextCategories.getText().toString() == ""){
+            makeToast("Please select a category");
+            return false;
+        }
+
+        if(binding.inputTextDate.getText().toString() == ""){
+            makeToast("Please select a date");
+            return false;
+        }
+
+        if(binding.inputTextCost.getText().toString() == ""){
+            makeToast("Please enter the expense's cost");
+            return false;
+        }
+
+        if(binding.inputTextDestination.getText().toString() == ""){
+            makeToast("Please enter the destination");
+            return false;
+        }
+
+        return true;
+    }
+
+    private void addExpense(){
+        String name = binding.inputTextName.getText().toString();
+        String category = binding.inputTextCategories.getText().toString();
+        String destination = binding.inputTextDestination.getText().toString();
+        String date = binding.inputTextDate.getText().toString();
+        boolean assessment = binding.switchRequiredAssessment.isChecked();
+        String description = binding.inputTextDescription.getText().toString();
+        double cost = Double.parseDouble(binding.inputTextCost.getText().toString());
+        String result = "Name: " + name + "\nCategory: " + category + "\nDestination: " + destination + "\nDate: " + date + "\nAssessment: " + assessment + "\nDescription: " + description + "\nCost: " + cost;
+                Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
     }
 
     private void updateDate(){
@@ -111,5 +129,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     public void setDate() {
         new DatePickerDialog(getContext(), date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void makeToast(String toast){
+        Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
     }
 }
