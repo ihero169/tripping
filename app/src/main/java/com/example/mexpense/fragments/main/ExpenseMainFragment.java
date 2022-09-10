@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.ExpenseAdapter;
 import com.example.mexpense.databinding.FragmentExpenseMainBinding;
+import com.example.mexpense.repository.ExpenseRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class ExpenseMainFragment extends Fragment implements View.OnClickListener {
@@ -25,6 +26,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
     private ExpenseAdapter adapter;
+    private ExpenseRepository repository;
 
     public static ExpenseMainFragment newInstance() {
         return new ExpenseMainFragment();
@@ -35,6 +37,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExpenseMainViewModel.class);
         binding = FragmentExpenseMainBinding.inflate(inflater, container, false);
+        repository = new ExpenseRepository(getContext());
 
         RecyclerView rv = binding.expenseRecyclerView;
         rv.setHasFixedSize(true);

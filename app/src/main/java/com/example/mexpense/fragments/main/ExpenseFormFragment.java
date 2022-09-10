@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,9 @@ import android.widget.Toast;
 
 import com.example.mexpense.R;
 import com.example.mexpense.databinding.FragmentExpenseFormBinding;
+import com.example.mexpense.entity.Expense;
+import com.example.mexpense.repository.ExpenseRepository;
+import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
@@ -30,6 +34,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     final Calendar myCalendar = Calendar.getInstance();
     private FragmentExpenseFormBinding binding;
     DatePickerDialog.OnDateSetListener date;
+    ExpenseRepository repository;
 
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
@@ -42,6 +47,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
 
         AutoCompleteTextView categoryView = binding.inputTextCategories;
+        repository = new ExpenseRepository(getContext());
 
         String[] items = new String[]{"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical Expenses", "Printing"};
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, items);
@@ -110,6 +116,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private void addExpense(){
+        repository.addExpense(getFormInput());
+    }
+
+    private Expense getFormInput(){
         String name = binding.inputTextName.getText().toString();
         String category = binding.inputTextCategories.getText().toString();
         String destination = binding.inputTextDestination.getText().toString();
@@ -117,8 +127,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         boolean assessment = binding.switchRequiredAssessment.isChecked();
         String description = binding.inputTextDescription.getText().toString();
         double cost = Double.parseDouble(binding.inputTextCost.getText().toString());
-        String result = "Name: " + name + "\nCategory: " + category + "\nDestination: " + destination + "\nDate: " + date + "\nAssessment: " + assessment + "\nDescription: " + description + "\nCost: " + cost;
-                Toast.makeText(getContext(), result, Toast.LENGTH_SHORT).show();
+        return new Expense( -1, name, category, destination, date, assessment,description, cost);
     }
 
     private void updateDate(){
