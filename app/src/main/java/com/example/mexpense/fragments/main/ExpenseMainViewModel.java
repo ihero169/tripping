@@ -13,8 +13,4 @@ import java.util.List;
 
 public class ExpenseMainViewModel extends ViewModel {
     public MutableLiveData<List<Expense>> expenseList = new MutableLiveData<List<Expense>>();
-
-    public void getExpenses(List<Expense> expenses){
-
-    }
 }

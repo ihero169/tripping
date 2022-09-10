@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,10 +19,13 @@ import android.view.ViewGroup;
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.ExpenseAdapter;
 import com.example.mexpense.databinding.FragmentExpenseMainBinding;
+import com.example.mexpense.entity.Expense;
 import com.example.mexpense.repository.ExpenseRepository;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class ExpenseMainFragment extends Fragment implements View.OnClickListener {
+import java.util.List;
+
+public class ExpenseMainFragment extends Fragment implements View.OnClickListener, ExpenseAdapter.ItemListener {
 
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
@@ -45,11 +49,12 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         mViewModel.expenseList.observe(
                 getViewLifecycleOwner(),
                 expenses -> {
-                    adapter = new ExpenseAdapter(expenses, (ExpenseAdapter.ExpenseListItemListener) this);
+                    adapter = new ExpenseAdapter(expenses, this);
                     binding.expenseRecyclerView.setAdapter(adapter);
                     binding.expenseRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 }
         );
+        repository.getExpenses(mViewModel.expenseList);
 
         FloatingActionButton btnAdd = binding.btnAdd;
         btnAdd.setOnClickListener(this);
@@ -65,5 +70,13 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
             default:
                 return;
         }
+    }
+
+    @Override
+    public void onItemClick(int expenseId) {
+        Bundle bundle = new Bundle();
+        bundle.putInt("expenseId", expenseId);
+        Log.d("Click Event", "Id: " + expenseId);
+        Navigation.findNavController(getView()).navigate(R.id.expenseDetailFragment, bundle);
     }
 }

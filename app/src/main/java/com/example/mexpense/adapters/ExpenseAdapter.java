@@ -48,25 +48,25 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             binding.textDate.setText(expense.getDate());
             binding.textName.setText(expense.getName());
             binding.iconCategory.setImageResource(getIcon(expense.getCategory()));
-            binding.getRoot().setOnClickListener( v-> {listener.onItemClick(expense.getId());});
+            binding.getRoot().setOnClickListener( v-> listener.onItemClick(expense.getId()));
         }
 
         private int getIcon(String category) {
             return binding.getRoot()
                     .getResources()
-                    .getIdentifier("ic_" + category, "drawable", binding.getRoot().getContext().getPackageName());
+                    .getIdentifier("ic_" + category.toLowerCase(), "drawable", binding.getRoot().getContext().getPackageName());
         }
     }
 
-    public interface ExpenseListItemListener {
+    public interface ItemListener {
         void onItemClick(int expenseId);
     }
 
     private List<Expense> expenseList;
 
-    private ExpenseListItemListener listener;
+    private ItemListener listener;
 
-    public ExpenseAdapter(List<Expense> expenseList, ExpenseListItemListener listener) {
+    public ExpenseAdapter(List<Expense> expenseList, ItemListener listener) {
         this.expenseList = expenseList;
         this.listener = listener;
     }

@@ -19,4 +19,9 @@
         android:name="com.example.mexpense.fragments.main.ExpenseFormFragment"
         android:label="fragment_expense_form"
         tools:layout="@layout/fragment_expense_form" />
+    <fragment
+        android:id="@+id/expenseDetailFragment"
+        android:name="com.example.mexpense.ExpenseDetailFragment"
+        android:label="fragment_expense_detail"
+        tools:layout="@layout/fragment_expense_detail" />
 </navigation>

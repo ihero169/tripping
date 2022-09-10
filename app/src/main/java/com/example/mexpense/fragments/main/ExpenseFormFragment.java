@@ -49,7 +49,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         AutoCompleteTextView categoryView = binding.inputTextCategories;
         repository = new ExpenseRepository(getContext());
 
-        String[] items = new String[]{"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical Expenses", "Printing"};
+        String[] items = new String[]{"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, items);
         categoryView.setAdapter(adapter);
 
@@ -87,27 +87,27 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private boolean validation(){
-        if(binding.inputTextName.getText().toString() == ""){
+        if(binding.inputTextName.getText().toString().equals("")){
             makeToast("Please enter the expense's name");
             return false;
         }
 
-        if(binding.inputTextCategories.getText().toString() == ""){
+        if(binding.inputTextCategories.getText().toString().equals("")){
             makeToast("Please select a category");
             return false;
         }
 
-        if(binding.inputTextDate.getText().toString() == ""){
+        if(binding.inputTextDate.getText().toString().equals("")){
             makeToast("Please select a date");
             return false;
         }
 
-        if(binding.inputTextCost.getText().toString() == ""){
+        if(binding.inputTextCost.getText().toString().equals("")){
             makeToast("Please enter the expense's cost");
             return false;
         }
 
-        if(binding.inputTextDestination.getText().toString() == ""){
+        if(binding.inputTextDestination.getText().toString().equals("")){
             makeToast("Please enter the destination");
             return false;
         }

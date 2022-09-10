@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mexpense.entity.Expense;
@@ -14,6 +15,8 @@ import com.example.mexpense.ultilities.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 public class ExpenseRepository extends SQLiteOpenHelper {
 
@@ -44,7 +47,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
             TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_CATEGORY, COLUMN_DESTINATION, COLUMN_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_DESCRIPTION, COLUMN_COST
     );
 
-    public ExpenseRepository(Context context) {
+    public ExpenseRepository(@Nullable Context context) {
         super(context, TABLE_NAME, null, 1);
         database = getWritableDatabase();
     }
@@ -66,7 +69,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put(COLUMN_CATEGORY, expense.getCategory());
+        cv.put(COLUMN_CATEGORY, expense.getCategory().toLowerCase());
         cv.put(COLUMN_COST, expense.getCost());
         cv.put(COLUMN_DATE, expense.getDate());
         cv.put(COLUMN_NAME, expense.getName());
@@ -77,25 +80,24 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         long insert = db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
     }
 
-    public List<Expense> getExpenses(){
+    public void getExpenses(MutableLiveData<List<Expense>> expenseList) {
         List<Expense> expenses = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME;
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        while(c.moveToFirst()){
-            do {
-                String name = c.getString(1);
-                String category = c.getString(6);
-                String destination = c.getString(2);
-                String date = c.getString(3);
-                boolean assessment = c.getString(4) == "1" ? true : false;
-                String description = c.getString(5);
-                double cost = Double.parseDouble(c.getString(7));
-                expenses.add(new Expense( Integer.parseInt(c.getString(0)), name, category, destination, date, assessment,description, cost));
-            } while (c.moveToNext());
+        while (c.moveToNext()) {
+            String name = c.getString(1);
+            String category = c.getString(2);
+            String destination = c.getString(3);
+            String date = c.getString(4);
+            boolean assessment = Objects.equals(c.getString(5), "1");
+            String description = c.getString(6);
+            double cost = Double.parseDouble(c.getString(7));
+            Expense expense = new Expense(Integer.parseInt(c.getString(0)), name, category, destination, date, assessment, description, cost);
+            Log.w("Database", expense.toString());
+            expenses.add(expense);
         }
         c.close();
         db.close();
-        return expenses;
+        expenseList.setValue(expenses);
     }
 }
