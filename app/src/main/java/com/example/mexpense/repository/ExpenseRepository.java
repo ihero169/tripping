@@ -77,7 +77,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         long insert = db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
     }
 
-    public void getExpenses(MutableLiveData<List<Expense>> expenseList){
+    public List<Expense> getExpenses(){
         List<Expense> expenses = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME;
@@ -94,6 +94,8 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                 expenses.add(new Expense( Integer.parseInt(c.getString(0)), name, category, destination, date, assessment,description, cost));
             } while (c.moveToNext());
         }
-        expenseList.setValue(expenses);
+        c.close();
+        db.close();
+        return expenses;
     }
 }

@@ -20,7 +20,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
     @Override
     public ExpenseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.expense_list_item, parent, false);
-        return  new ExpenseViewHolder(view);
+        return new ExpenseViewHolder(view);
     }
 
     @Override
@@ -48,6 +48,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
             binding.textDate.setText(expense.getDate());
             binding.textName.setText(expense.getName());
             binding.iconCategory.setImageResource(getIcon(expense.getCategory()));
+            binding.getRoot().setOnClickListener( v-> {listener.onItemClick(expense.getId());});
         }
 
         private int getIcon(String category) {
@@ -57,9 +58,16 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         }
     }
 
+    public interface ExpenseListItemListener {
+        void onItemClick(int expenseId);
+    }
+
     private List<Expense> expenseList;
 
-    public ExpenseAdapter(List<Expense> expenseList) {
+    private ExpenseListItemListener listener;
+
+    public ExpenseAdapter(List<Expense> expenseList, ExpenseListItemListener listener) {
         this.expenseList = expenseList;
+        this.listener = listener;
     }
 }

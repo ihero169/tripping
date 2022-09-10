@@ -44,8 +44,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
 
         mViewModel.expenseList.observe(
                 getViewLifecycleOwner(),
-                expenseList -> {
-                    adapter = new ExpenseAdapter(expenseList);
+                expenses -> {
+                    adapter = new ExpenseAdapter(expenses, (ExpenseAdapter.ExpenseListItemListener) this);
                     binding.expenseRecyclerView.setAdapter(adapter);
                     binding.expenseRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 }

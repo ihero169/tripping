@@ -13,13 +13,8 @@ import java.util.List;
 
 public class ExpenseMainViewModel extends ViewModel {
     public MutableLiveData<List<Expense>> expenseList = new MutableLiveData<List<Expense>>();
-    ExpenseRepository repository;
 
-    {
-        repository = new ExpenseRepository();
-    }
+    public void getExpenses(List<Expense> expenses){
 
-    public void getExpenses(){
-        repository.getExpenses(expenseList);
     }
 }
