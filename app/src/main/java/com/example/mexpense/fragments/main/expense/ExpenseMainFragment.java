@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,7 @@ import com.example.mexpense.adapters.ExpenseAdapter;
 import com.example.mexpense.databinding.FragmentExpenseMainBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
+import com.example.mexpense.services.TripService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.Calendar;
@@ -29,7 +31,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
     private ExpenseAdapter adapter;
-    private ExpenseService service;
+    private ExpenseService expenseService;
+    private TripService tripService;
     private int tripId;
 
     public static ExpenseMainFragment newInstance() {
@@ -41,9 +44,15 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExpenseMainViewModel.class);
         binding = FragmentExpenseMainBinding.inflate(inflater, container, false);
-        service = new ExpenseService(getContext());
+
+        expenseService = new ExpenseService(getContext());
+        tripService = new TripService(getContext());
 
         tripId = getArguments().getInt("tripId");
+        Log.i("Trip", "onCreateView: " + tripId);
+
+//        TextView name = binding.textExpenseTripName;
+//        name.setOnClickListener(this);
 
         RecyclerView rv = binding.expenseRecyclerView;
         rv.setHasFixedSize(true);
@@ -57,8 +66,19 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                 }
         );
 
-        service.getExpenses(mViewModel.expenseList, tripId);
-        setTotal(-1, -1, -1);
+        mViewModel.trip.observe(
+                getViewLifecycleOwner(),
+                trip -> {
+                    binding.textExpenseTripName.setText(trip.getName());
+                    binding.textTripStartDate.setText(trip.getStartDate());
+                    binding.textTripEndDate.setText(trip.getEndDate());
+                    binding.textExpenseTripDestination.setText(trip.getDestination());
+                }
+        );
+
+        expenseService.getExpenses(mViewModel.expenseList, tripId);
+        tripService.getTrip(mViewModel.trip, tripId);
+        tripService.updateTotal(tripId, getTotal());
 
         FloatingActionButton btnAdd = binding.btnAdd;
         btnAdd.setOnClickListener(this);
@@ -71,6 +91,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         switch (view.getId()) {
             case R.id.btnAdd:
                 addExpense();
+            case R.id.textExpenseTripName:
+                Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment);
             default:
                 return;
         }
@@ -92,32 +114,13 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
     }
 
-    public void setTotal(int day, int month, int year) {
-        Calendar cal = Calendar.getInstance();
+    public double getTotal() {
         double total = 0.0;
-        // int month = cal.get(Calendar.MONTH);
         List<Expense> expenses = mViewModel.expenseList.getValue();
-        for (int i = 0; i < expenses.size(); i++) {
-            String[] date = expenses.get(i).getDate().split("/");
-            if (day != -1) {
-                if (Integer.parseInt(date[0]) == day) {
-                    total += expenses.get(i).getCost();
-                }
-                else continue;
-            } else if (month != -1) {
-                if (Integer.parseInt(date[1]) == month + 1) {
-                    total += expenses.get(i).getCost();
-                }
-                else continue;
-            } else if (year != -1) {
-                if (Integer.parseInt(date[2]) == year) {
-                    total += expenses.get(i).getCost();
-                }
-                else continue;
-            } else {
-                total += expenses.get(i).getCost();
-            }
+        for (int i = 0; i < (expenses != null ? expenses.size() : 0); i++) {
+            total += expenses.get(i).getCost();
             binding.textTotal.setText(Double.toString(total));
         }
+        return total;
     }
 }

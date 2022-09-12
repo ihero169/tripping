@@ -53,7 +53,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         } catch (Exception e) {
             expenseId = -1;
         }
-        tripId = getArguments().getInt("tripId");
+        
+        tripId = getArguments() != null ? getArguments().getInt("tripId") : 0;
 
         getCategories();
         TextInputEditText editDate = binding.inputDate;
@@ -86,7 +87,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnSaveTrip:
+            case R.id.btnSaveExpense:
                 handleSave();
                 break;
             case R.id.inputDate:
@@ -115,7 +116,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         } else {
                             service.updateExpense(expenseId, getFormInput());
                         }
-                        Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment);
+
+                        Bundle bundle = new Bundle();
+                        bundle.putInt("tripId", tripId);
+                        Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
                     }).setNegativeButton("No", null).show();
         }
     }

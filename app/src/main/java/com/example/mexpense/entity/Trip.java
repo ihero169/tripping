@@ -10,6 +10,7 @@ public class Trip {
     private String endDate;
     private boolean requiredAssessment;
     private String description;
+    private double total;
 
     public Trip() {
         this.id = Constants.NEW_TRIP;
@@ -29,6 +30,18 @@ public class Trip {
         this.endDate = endDate;
         this.requiredAssessment = requiredAssessment;
         this.description = description;
+        this.total = 0;
+    }
+
+    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, String description, Double total) {
+        this.id = id;
+        this.name = name;
+        this.destination = destination;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.requiredAssessment = requiredAssessment;
+        this.description = description;
+        this.total = total;
     }
 
     public int getId() {
@@ -77,6 +90,14 @@ public class Trip {
 
     public void setRequiredAssessment(boolean requiredAssessment) {
         this.requiredAssessment = requiredAssessment;
+    }
+
+    public double getTotal() {
+        return total;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
     }
 
     public String getDescription() {

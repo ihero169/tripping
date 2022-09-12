@@ -1,16 +1,14 @@
 package com.example.mexpense.fragments.main.expense;
 
-import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.mexpense.entity.Expense;
-import com.example.mexpense.repository.ExpenseRepository;
+import com.example.mexpense.entity.Trip;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ExpenseMainViewModel extends ViewModel {
     public MutableLiveData<List<Expense>> expenseList = new MutableLiveData<List<Expense>>();
+    public MutableLiveData<Trip> trip = new MutableLiveData<>();
 }

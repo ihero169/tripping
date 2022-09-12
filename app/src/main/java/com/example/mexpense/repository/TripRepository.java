@@ -25,6 +25,7 @@ public class TripRepository extends SQLiteOpenHelper {
     public static final String COLUMN_END_DATE = "endDate"; // Required
     public static final String COLUMN_REQUIRED_ASSESSMENT = "comment"; // Optional
     public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_TOTAL = "total";
 
     private SQLiteDatabase database;
 
@@ -36,8 +37,9 @@ public class TripRepository extends SQLiteOpenHelper {
                     " %s TEXT, " +
                     " %s TEXT, " +
                     " %s TEXT, " +
-                    " %s TEXT)",
-            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_DESTINATION, COLUMN_START_DATE, COLUMN_END_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_DESCRIPTION
+                    " %s TEXT, " +
+                    " %s REAL)",
+            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_DESTINATION, COLUMN_START_DATE, COLUMN_END_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_DESCRIPTION, COLUMN_TOTAL
     );
 
     public TripRepository(Context context) {
@@ -69,7 +71,8 @@ public class TripRepository extends SQLiteOpenHelper {
             String endDate = c.getString(4);
             boolean assessment = Objects.equals(c.getString(5), "1");
             String description = c.getString(6);
-            Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, description);
+            Double total = Double.parseDouble(c.getString(7));
+            Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, description, total);
             trips.add(t);
             Log.w(Constants.SQL, t.toString());
         }
@@ -90,6 +93,7 @@ public class TripRepository extends SQLiteOpenHelper {
             t.setEndDate(c.getString(4));
             t.setDescription(c.getString(5));
             t.setRequiredAssessment(c.getString(6).equals("1"));
+            t.setTotal(Double.parseDouble(c.getString(7)));
         }
         c.close();
         db.close();
@@ -107,6 +111,7 @@ public class TripRepository extends SQLiteOpenHelper {
         cv.put(COLUMN_END_DATE, trip.getEndDate());
         cv.put(COLUMN_REQUIRED_ASSESSMENT, trip.getRequiredAssessment() ? "1" : "0");
         cv.put(COLUMN_DESCRIPTION, trip.getDescription());
+        cv.put(COLUMN_TOTAL, 0.0);
 
         db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
         db.close();
@@ -128,7 +133,16 @@ public class TripRepository extends SQLiteOpenHelper {
         cv.put(COLUMN_END_DATE, trip.getEndDate());
         cv.put(COLUMN_REQUIRED_ASSESSMENT, trip.getRequiredAssessment() ? "1" : "0");
         cv.put(COLUMN_DESCRIPTION, trip.getDescription());
+        cv.put(COLUMN_TOTAL, trip.getTotal());
 
+        db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    public void updateTotal(int id, double total){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_TOTAL, total);
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         db.close();
     }

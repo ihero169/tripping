@@ -28,6 +28,8 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
             binding.textEndDate.setText(trip.getEndDate());
             binding.textTripDestination.setText(trip.getDestination());
             binding.textTripName.setText(trip.getName());
+            String s = "$" + trip.getTotal();
+            binding.textTotalCost.setText(s);
             binding.getRoot().setOnClickListener( view -> listener.onItemClick(trip.getId()));
         }
     }

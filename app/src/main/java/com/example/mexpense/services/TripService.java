@@ -35,4 +35,8 @@ public class TripService {
     public void updateTrip(int id, Trip trip){
         repository.updateTrip(id, trip);
     }
+
+    public void updateTotal(int id, double total) {
+        repository.updateTotal(id, total);
+    }
 }

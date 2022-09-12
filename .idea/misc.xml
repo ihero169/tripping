@@ -23,10 +23,15 @@
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/fragment_trip_main.xml" value="0.33" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/spinner_item.xml" value="0.33967391304347827" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpense/app/src/main/res/layout/trip_list_item.xml" value="0.33" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/drawable/ic_arrow_left.xml" value="0.1855" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/drawable/ic_gifts.xml" value="0.124" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/drawable/ic_telephone.xml" value="0.124" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/activity_main.xml" value="0.12360688956433637" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/fragment_expense_detail.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/fragment_expense_form.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/fragment_expense_main.xml" value="0.536" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/mexpense_action_bar.xml" value="0.264" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/MExpenseNative/app/src/main/res/layout/trip_list_item.xml" value="0.264" />
       </map>
     </option>
   </component>

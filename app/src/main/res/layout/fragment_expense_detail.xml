@@ -157,17 +157,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textExpenseDestination" />
 
-    <TextView
-        android:id="@+id/label_destination"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:fontFamily="@font/founders_grotesk_medium"
-        android:text="Destination"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_expense_date" />
-
     <Button
         android:id="@+id/btnDeleteExpense"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
