@@ -1,4 +1,4 @@
-package com.example.mexpense.fragments.main;
+package com.example.mexpense.fragments.main.expense;
 
 import android.content.Context;
 

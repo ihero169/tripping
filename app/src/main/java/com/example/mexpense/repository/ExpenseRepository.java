@@ -8,14 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.MutableLiveData;
 
 import com.example.mexpense.entity.Expense;
-import com.example.mexpense.ultilities.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 public class ExpenseRepository extends SQLiteOpenHelper {
@@ -23,14 +20,11 @@ public class ExpenseRepository extends SQLiteOpenHelper {
     public static final String TABLE_NAME = "expenses_table";
 
     public static final String COLUMN_ID = "expense_id";
-    public static final String COLUMN_NAME = "name"; // Required
-    public static final String COLUMN_DESTINATION = "destination"; // Required
-    public static final String COLUMN_DATE = "date"; // Required
-    public static final String COLUMN_REQUIRED_ASSESSMENT = "required_assessment"; // Required
-    public static final String COLUMN_DESCRIPTION = "description"; // Optional
     public static final String COLUMN_CATEGORY = "category"; // Required
     public static final String COLUMN_COST = "cost"; // Required
-    //
+    public static final String COLUMN_DATE = "date"; // Required
+    public static final String COLUMN_COMMENT = "comment"; // Optional
+    public static final String COLUMN_TRIP_ID = "trip_id";
 
     private SQLiteDatabase database;
 
@@ -38,13 +32,11 @@ public class ExpenseRepository extends SQLiteOpenHelper {
             "CREATE TABLE %s (" +
                     " %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " %s TEXT, " +
+                    " %s REAL, " +
                     " %s TEXT, " +
                     " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT)",
-            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_CATEGORY, COLUMN_DESTINATION, COLUMN_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_DESCRIPTION, COLUMN_COST
+                    " %s INTEGER )",
+            TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST,  COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID
     );
 
     public ExpenseRepository(@Nullable Context context) {
@@ -65,39 +57,74 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         onCreate(database);
     }
 
+    public List<Expense> getExpenses(int trip) {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        while (c.moveToNext())
+        {
+            if(Integer.parseInt(c.getString(5)) == trip){
+                String category = c.getString(1);
+                double cost = Double.parseDouble(c.getString(2));
+                String date = c.getString(3);
+                String comment = c.getString(4);
+                int trip_id = Integer.parseInt(c.getString(5));
+                Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, date, comment, trip_id);
+                Log.w("Database", expense.toString());
+                expenses.add(expense);
+            }
+        }
+        c.close();
+        db.close();
+        return expenses;
+    }
+
+    public Expense getExpenseById(int id) {
+        Expense e = new Expense();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + "=" + id, null);
+        while (c.moveToNext()) {
+            e.setId(Integer.parseInt(c.getString(0)));
+            e.setCategory(c.getString(1));
+            e.setCost(Double.parseDouble(c.getString(2)));
+            e.setDate(c.getString(3));
+            e.setComment(c.getString(4));
+            e.setTripId(Integer.parseInt(c.getString(5)));
+            Log.i("DB", e.toString());
+        }
+        c.close();
+        db.close();
+        return e;
+    }
+
     public void addExpense(Expense expense) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_CATEGORY, expense.getCategory());
+        cv.put(COLUMN_COST, expense.getCost());
+        cv.put(COLUMN_DATE, expense.getDate());
+        cv.put(COLUMN_COMMENT, expense.getComment());
+        cv.put(COLUMN_TRIP_ID, expense.getTripId());
+        db.insert(TABLE_NAME, COLUMN_COMMENT, cv);
+        db.close();
+    }
+
+    public void deleteExpenses(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
+    public void updateExpense(int id, Expense expense) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
         cv.put(COLUMN_CATEGORY, expense.getCategory().toLowerCase());
         cv.put(COLUMN_COST, expense.getCost());
         cv.put(COLUMN_DATE, expense.getDate());
-        cv.put(COLUMN_NAME, expense.getName());
-        cv.put(COLUMN_DESCRIPTION, expense.getDescription());
-        cv.put(COLUMN_DESTINATION, expense.getDestination());
-        cv.put(COLUMN_REQUIRED_ASSESSMENT, expense.getRequiredAssessment() ? "1" : "0");
+        cv.put(COLUMN_COMMENT, expense.getComment());
 
-        long insert = db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
-    }
-
-    public void getExpenses(MutableLiveData<List<Expense>> expenseList) {
-        List<Expense> expenses = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        while (c.moveToNext()) {
-            String name = c.getString(1);
-            String category = c.getString(2);
-            String destination = c.getString(3);
-            String date = c.getString(4);
-            boolean assessment = Objects.equals(c.getString(5), "1");
-            String description = c.getString(6);
-            double cost = Double.parseDouble(c.getString(7));
-            Expense expense = new Expense(Integer.parseInt(c.getString(0)), name, category, destination, date, assessment, description, cost);
-            Log.w("Database", expense.toString());
-            expenses.add(expense);
-        }
-        c.close();
+        db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         db.close();
-        expenseList.setValue(expenses);
     }
 }

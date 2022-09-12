@@ -46,7 +46,7 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         public void bindData(Expense expense) {
             binding.textCost.setText("$ " + String.valueOf(expense.getCost()));
             binding.textDate.setText(expense.getDate());
-            binding.textName.setText(expense.getName());
+            binding.textCategory.setText(expense.getCategory());
             binding.iconCategory.setImageResource(getIcon(expense.getCategory()));
             binding.getRoot().setOnClickListener( v-> listener.onItemClick(expense.getId()));
         }
