@@ -4,6 +4,7 @@ package com.example.mexpense.fragments.main.expense;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,8 +36,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private FragmentExpenseFormBinding binding;
     DatePickerDialog.OnDateSetListener date;
     private ExpenseService service;
-    int expenseId;
-    int tripId;
+    private int expenseId;
+    private int tripId;
 
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
@@ -45,16 +46,18 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+
         mViewModel = new ViewModelProvider(this).get(ExpenseFormViewModel.class);
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
         service = new ExpenseService(getContext());
+
         try {
             expenseId = getArguments().getInt("expenseId");
         } catch (Exception e) {
             expenseId = -1;
         }
-        
-        tripId = getArguments() != null ? getArguments().getInt("tripId") : 0;
+
+        tripId = getArguments().getInt("tripId");
 
         getCategories();
         TextInputEditText editDate = binding.inputDate;
@@ -119,12 +122,18 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
                         Bundle bundle = new Bundle();
                         bundle.putInt("tripId", tripId);
+                        Log.e("Trip ID:", "handleSave: " + tripId);
                         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
+
                     }).setNegativeButton("No", null).show();
         }
     }
 
     private boolean validation() {
+
+        String startDate = getArguments().getString("startDate");
+        String endDate = getArguments().getString("endDate");
+
         if (binding.inputTextCategories.getText().toString().equals("")) {
             makeToast("Please select a category");
             return false;
@@ -139,7 +148,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             makeToast("Please enter the expense's cost");
             return false;
         }
-
         return true;
     }
 

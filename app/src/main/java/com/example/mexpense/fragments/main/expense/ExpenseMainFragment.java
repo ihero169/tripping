@@ -1,11 +1,12 @@
 package com.example.mexpense.fragments.main.expense;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,7 +24,6 @@ import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.services.TripService;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Calendar;
 import java.util.List;
 
 public class ExpenseMainFragment extends Fragment implements View.OnClickListener, ExpenseAdapter.ItemListener {
@@ -44,12 +44,17 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExpenseMainViewModel.class);
         binding = FragmentExpenseMainBinding.inflate(inflater, container, false);
-
         expenseService = new ExpenseService(getContext());
         tripService = new TripService(getContext());
 
-        tripId = getArguments().getInt("tripId");
-        Log.i("Trip", "onCreateView: " + tripId);
+        try{
+            tripId = getArguments().getInt("tripId");
+            Log.i("Trip", "onCreateView: " + tripId);
+        } catch (Exception e){
+            Log.e("Trip", "Failed to get tripId");
+            Log.e("Trip", e.toString());
+        }
+
 
 //        TextView name = binding.textExpenseTripName;
 //        name.setOnClickListener(this);
@@ -80,7 +85,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         tripService.getTrip(mViewModel.trip, tripId);
         tripService.updateTotal(tripId, getTotal());
 
-        FloatingActionButton btnAdd = binding.btnAdd;
+        FloatingActionButton btnAdd = binding.btnAddExpense;
         btnAdd.setOnClickListener(this);
 
         return binding.getRoot();
@@ -89,10 +94,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.btnAdd:
+            case R.id.btnAddExpense:
                 addExpense();
-            case R.id.textExpenseTripName:
-                Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment);
             default:
                 return;
         }
@@ -100,17 +103,13 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onItemClick(int expenseId) {
-        Bundle bundle = new Bundle();
-        bundle.putInt("expenseId", expenseId);
+        Bundle bundle = getBundle(expenseId);
         Log.d("Android", "Id: " + expenseId);
-        Navigation.findNavController(getView()).navigate(R.id.expenseDetailFragment, bundle);
+        Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
     }
 
     public void addExpense() {
-        Bundle bundle = new Bundle();
-        bundle.putInt("expenseId", -1);
-        bundle.putInt("tripId", tripId);
-        Log.d("Android", "Add new expense");
+        Bundle bundle = getBundle(-1);
         Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
     }
 
@@ -123,4 +122,14 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         }
         return total;
     }
+
+    private Bundle getBundle(int expenseId){
+        Bundle bundle = new Bundle();
+        bundle.putInt("expenseId", expenseId);
+        bundle.putInt("tripId", tripId);
+        bundle.putString("startDate", binding.textTripStartDate.getText().toString());
+        bundle.putString("endDate", binding.textTripEndDate.getText().toString());
+        return bundle;
+    }
+
 }

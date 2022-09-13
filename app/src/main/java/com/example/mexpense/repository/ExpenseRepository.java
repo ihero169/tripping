@@ -119,7 +119,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put(COLUMN_CATEGORY, expense.getCategory().toLowerCase());
+        cv.put(COLUMN_CATEGORY, expense.getCategory());
         cv.put(COLUMN_COST, expense.getCost());
         cv.put(COLUMN_DATE, expense.getDate());
         cv.put(COLUMN_COMMENT, expense.getComment());
