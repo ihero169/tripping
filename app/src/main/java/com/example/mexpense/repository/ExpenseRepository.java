@@ -35,7 +35,8 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                     " %s REAL, " +
                     " %s TEXT, " +
                     " %s TEXT, " +
-                    " %s INTEGER )",
+                    " %s INTEGER," +
+                    " FOREIGN KEY(trip_id) REFERENCES trips_table(trip_id) ON DELETE CASCADE )",
             TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST,  COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID
     );
 

@@ -20,11 +20,6 @@
         android:label="fragment_expense_form"
         tools:layout="@layout/fragment_expense_form" />
     <fragment
-        android:id="@+id/expenseDetailFragment"
-        android:name="com.example.mexpense.fragments.main.expense.ExpenseDetailFragment"
-        android:label="fragment_expense_detail"
-        tools:layout="@layout/fragment_expense_detail" />
-    <fragment
         android:id="@+id/tripMainFragment"
         android:name="com.example.mexpense.fragments.main.trip.TripMainFragment"
         android:label="fragment_trip_main"

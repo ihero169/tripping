@@ -25,8 +25,12 @@ import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
@@ -144,11 +148,23 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             return false;
         }
 
+        if(!dateValidation(startDate, endDate, binding.inputDate.getText().toString())){
+            makeToast("Expense date must be within " + startDate + " and " + endDate);
+            return false;
+        }
+
         if (binding.inputCost.getText().toString().equals("")) {
             makeToast("Please enter the expense's cost");
             return false;
         }
         return true;
+    }
+
+    private boolean dateValidation(String startStr, String endStr, String date){
+        LocalDate startDate = LocalDate.parse(startStr);
+        LocalDate endDate = LocalDate.parse(endStr);
+        LocalDate expenseDate = LocalDate.parse(date);
+        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate);
     }
 
     private Expense getFormInput() {
