@@ -23,9 +23,11 @@ import com.example.mexpense.R;
 import com.example.mexpense.databinding.FragmentExpenseFormBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
+import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.DateFormat;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -160,11 +162,12 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         return true;
     }
 
-    private boolean dateValidation(String startStr, String endStr, String date){
-        LocalDate startDate = LocalDate.parse(startStr);
-        LocalDate endDate = LocalDate.parse(endStr);
-        LocalDate expenseDate = LocalDate.parse(date);
-        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate);
+    private boolean dateValidation(String startStr, String endStr, String expenseStr){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+        LocalDate startDate = LocalDate.parse(startStr, formatter);
+        LocalDate endDate = LocalDate.parse(endStr, formatter);
+        LocalDate expenseDate = LocalDate.parse(expenseStr, formatter);
+        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate) || expenseDate.isEqual(startDate)  || expenseDate.isEqual(endDate);
     }
 
     private Expense getFormInput() {
@@ -176,7 +179,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private void updateDate() {
-        String format = "dd/MM/yyyy";
+        String format = Constants.DATE_FORMAT;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         binding.inputDate.setText(dateFormat.format(myCalendar.getTime()));
     }

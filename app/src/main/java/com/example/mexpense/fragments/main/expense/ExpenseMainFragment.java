@@ -78,6 +78,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                     binding.textTripStartDate.setText(trip.getStartDate());
                     binding.textTripEndDate.setText(trip.getEndDate());
                     binding.textExpenseTripDestination.setText(trip.getDestination());
+                    binding.textRequiredAssessment.setText(trip.getRequiredAssessment() ? "Assessment Required " : "Assessment Not Required");
                 }
         );
 

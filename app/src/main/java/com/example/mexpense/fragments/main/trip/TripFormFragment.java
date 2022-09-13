@@ -20,9 +20,12 @@ import com.example.mexpense.R;
 import com.example.mexpense.databinding.FragmentTripFormBinding;
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.services.TripService;
+import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -132,7 +135,19 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
             return false;
         }
 
+        if(!dateValidation(binding.inputStartDate.getText().toString(), binding.inputEndDate.getText().toString())){
+            makeToast("The start date must be before or same as the end date");
+            return false;
+        }
+
         return true;
+    }
+
+    private boolean dateValidation(String startStr, String endStr){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+        LocalDate startDate = LocalDate.parse(startStr, formatter);
+        LocalDate endDate = LocalDate.parse(endStr, formatter);
+        return endDate.isAfter(startDate) || endDate.isEqual(startDate);
     }
 
     private Trip getFormInput(){
@@ -146,7 +161,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
     }
 
     private void updateDate(TextView dateView) {
-        String format = "dd/MM/yyyy";
+        String format = Constants.DATE_FORMAT;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         dateView.setText(dateFormat.format(myCalendar.getTime()));
     }
@@ -154,4 +169,5 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
     private void makeToast(String toast) {
         Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
     }
+
 }
