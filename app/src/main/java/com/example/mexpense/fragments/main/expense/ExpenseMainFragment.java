@@ -1,15 +1,21 @@
 package com.example.mexpense.fragments.main.expense;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -89,7 +95,40 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         FloatingActionButton btnAdd = binding.btnAddExpense;
         btnAdd.setOnClickListener(this);
 
+        AppCompatActivity app = (AppCompatActivity)getActivity();
+        ActionBar ab = app.getSupportActionBar();
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        setHasOptionsMenu(true);
+
         return binding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
+        inflater.inflate(R.menu.menu_trip_fragment, menu);
+        menu.findItem(R.id.action_delete).setVisible(true);
+        menu.findItem(R.id.action_edit).setVisible(true);
+        menu.findItem(R.id.action_reset).setVisible(false);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                return true;
+            case R.id.action_delete:
+                handleDelete();
+                return true;
+            case R.id.action_edit:
+                handleEdit();
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -133,4 +172,20 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         return bundle;
     }
 
+    private void handleDelete(){
+        new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Confirmation").setMessage("Are you sure?")
+                .setPositiveButton("Yes", (arg0, arg1) -> {
+                    tripService.deleteTrip(tripId);
+                    Bundle bundle = new Bundle();
+                    Log.e("Action", "Delete trip: " + tripId);
+                    Navigation.findNavController(getView()).navigate(R.id.tripMainFragment, bundle);
+                }).setNegativeButton("No", null).show();
+    }
+
+    private void handleEdit(){
+        Bundle bundle = getBundle(tripId);
+        Log.d("Android", "Id: " + tripId);
+        Navigation.findNavController(getView()).navigate(R.id.tripFormFragment, bundle);
+    }
 }

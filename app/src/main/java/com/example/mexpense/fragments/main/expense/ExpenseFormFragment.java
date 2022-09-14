@@ -6,6 +6,9 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -15,6 +18,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -73,9 +78,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         editDate.setOnClickListener(this);
 
         date = (datePicker, year, month, day) -> {
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, month);
-            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            setCalendar(year, month, day);
             updateDate();
         };
 
@@ -90,8 +93,50 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         );
         service.getExpenseById(mViewModel.expense, expenseId);
 
+        AppCompatActivity app = (AppCompatActivity)getActivity();
+        ActionBar ab = app.getSupportActionBar();
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        setHasOptionsMenu(true);
+
+        requireActivity().invalidateOptionsMenu();
+
         return binding.getRoot();
     }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
+        inflater.inflate(R.menu.menu_trip_fragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                return true;
+            case R.id.action_delete:
+                handleDelete();
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        Expense e = mViewModel.expense.getValue();
+        menu.findItem(R.id.action_reset).setVisible(false);
+        menu.findItem(R.id.action_edit).setVisible(false);
+        if (e != null
+                && e.getId() == Constants.NEW_EXPENSE){
+            menu.findItem(R.id.action_delete).setVisible(false);
+        }
+    }
+
 
     @Override
     public void onClick(View view) {
@@ -113,6 +158,19 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, items);
         categoryView.setAdapter(adapter);
         categoryView.setOnClickListener(this);
+    }
+
+    private void handleDelete(){
+        new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Confirmation").setMessage("Are you sure?")
+                .setPositiveButton("Yes", (arg0, arg1) -> {
+                    service.deleteExpense(expenseId);
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("tripId", tripId);
+                    Log.e("Action", "Delete expense: " + expenseId);
+                    Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
+
+                }).setNegativeButton("No", null).show();
     }
 
     private void handleSave() {
@@ -183,9 +241,19 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         binding.inputDate.setText(dateFormat.format(myCalendar.getTime()));
     }
-
     public void setDate() {
+        if(expenseId == -1){
+            DateTimeFormatter source = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+            LocalDate startDate = LocalDate.parse(getArguments().getString("startDate"), source);
+            setCalendar(startDate.getYear(), startDate.getMonthValue() - 1, startDate.getDayOfMonth());
+        }
         new DatePickerDialog(getContext(), date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private void setCalendar(int year, int month, int day){
+        myCalendar.set(Calendar.YEAR, year);
+        myCalendar.set(Calendar.MONTH, month);
+        myCalendar.set(Calendar.DAY_OF_MONTH, day);
     }
 
     private void makeToast(String toast) {

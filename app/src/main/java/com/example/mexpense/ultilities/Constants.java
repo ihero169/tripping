@@ -6,4 +6,5 @@ public class Constants {
     public static final String SQL = "SQL";
     public static final String DATABASE_NAME = "MExpense";
     public static final String DATE_FORMAT = "dd MMM, yyyy";
+
 }

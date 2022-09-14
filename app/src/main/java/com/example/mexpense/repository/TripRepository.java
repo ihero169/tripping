@@ -77,7 +77,6 @@ public class TripRepository extends SQLiteOpenHelper {
             Log.w(Constants.SQL, t.toString());
         }
         c.close();
-        db.close();
         return trips;
     }
 
@@ -96,7 +95,6 @@ public class TripRepository extends SQLiteOpenHelper {
             t.setTotal(Double.parseDouble(c.getString(7)));
         }
         c.close();
-        db.close();
         Log.w(Constants.SQL, t.toString());
         return t;
     }
@@ -114,13 +112,11 @@ public class TripRepository extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL, 0.0);
 
         db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
-        db.close();
     }
 
     public void deleteTrip(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
-        db.close();
     }
 
     public void updateTrip(int id, Trip trip){
@@ -136,7 +132,6 @@ public class TripRepository extends SQLiteOpenHelper {
         cv.put(COLUMN_TOTAL, trip.getTotal());
 
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
-        db.close();
     }
 
     public void updateTotal(int id, double total){
@@ -144,6 +139,30 @@ public class TripRepository extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_TOTAL, total);
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
-        db.close();
+    }
+
+    public List<Trip> searchTripByName(String keyword) {
+        List<Trip> trips = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + " LIKE '%" + keyword + "%'", null);
+        while (c.moveToNext()){
+            String name = c.getString(1);
+            String destination = c.getString(2);
+            String startDate = c.getString(3);
+            String endDate = c.getString(4);
+            boolean assessment = Objects.equals(c.getString(5), "1");
+            String description = c.getString(6);
+            Double total = Double.parseDouble(c.getString(7));
+            Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, description, total);
+            trips.add(t);
+            Log.w(Constants.SQL, t.toString());
+        }
+        c.close();
+        return trips;
+    }
+
+    public void deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NAME);
     }
 }

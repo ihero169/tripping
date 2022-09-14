@@ -40,4 +40,5 @@ public class ExpenseService {
     public void addExpense(Expense expense) {
         repository.addExpense(expense);
     }
+
 }

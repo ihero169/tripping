@@ -5,8 +5,12 @@ import android.content.Context;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mexpense.entity.Trip;
+import com.example.mexpense.repository.ExpenseRepository;
 import com.example.mexpense.repository.TripRepository;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class TripService {
@@ -38,5 +42,17 @@ public class TripService {
 
     public void updateTotal(int id, double total) {
         repository.updateTotal(id, total);
+    }
+
+    public void deleteTrip(int tripId) {
+        repository.deleteTrip(tripId);
+    }
+
+    public void resetDatabase() {
+        repository.deleteAll();
+    }
+
+    public void searchTripByName(MutableLiveData<List<Trip>> tripList, String s) {
+        tripList.setValue(repository.searchTripByName(s));
     }
 }

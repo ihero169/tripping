@@ -6,10 +6,16 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -18,7 +24,9 @@ import android.widget.Toast;
 
 import com.example.mexpense.R;
 import com.example.mexpense.databinding.FragmentTripFormBinding;
+import com.example.mexpense.entity.Expense;
 import com.example.mexpense.entity.Trip;
+import com.example.mexpense.fragments.main.expense.ExpenseFormViewModel;
 import com.example.mexpense.services.TripService;
 import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
@@ -49,7 +57,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-
+        mViewModel = new ViewModelProvider(this).get(TripFormViewModel.class);
         binding = FragmentTripFormBinding.inflate(inflater, container, false);
         service = new TripService(getContext());
 
@@ -80,7 +88,58 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
         Button btnSaveTrip = binding.btnSaveTrip;
         btnSaveTrip.setOnClickListener(this);
 
+        mViewModel.trip.observe(
+                getViewLifecycleOwner(),
+                trip -> {
+                    binding.inputTextName.setText(trip.getName());
+                    binding.inputStartDate.setText(trip.getStartDate());
+                    binding.inputEndDate.setText(trip.getEndDate());
+                    binding.inputTextDestination.setText(trip.getDestination());
+                    binding.inputTextDescription.setText(trip.getDestination());
+                    binding.switchRequiredAssessment.setChecked(trip.getRequiredAssessment());
+                }
+        );
+        service.getTrip(mViewModel.trip, tripId);
+
+        AppCompatActivity app = (AppCompatActivity)getActivity();
+        ActionBar ab = app.getSupportActionBar();
+        ab.setHomeButtonEnabled(true);
+        ab.setDisplayShowHomeEnabled(true);
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        setHasOptionsMenu(true);
+
+        requireActivity().invalidateOptionsMenu();
+
         return binding.getRoot();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
+        inflater.inflate(R.menu.menu_trip_fragment, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                return true;
+            default: return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(@NonNull Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        Trip t = mViewModel.trip.getValue();
+        menu.findItem(R.id.action_reset).setVisible(false);
+        if (t != null
+                && t.getId() == Constants.NEW_EXPENSE){
+            menu.findItem(R.id.action_delete).setVisible(false);
+            menu.findItem(R.id.action_edit).setVisible(true);
+        }
     }
 
     @Override
