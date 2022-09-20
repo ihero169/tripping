@@ -1,5 +1,6 @@
 package com.example.mexpense.fragments.main.trip;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -18,6 +19,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,7 +95,8 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
                 trip -> {
-                    binding.inputTextName.setText(trip.getName());
+                    binding.inputTextTripType.setText(trip.getName());
+                    getTrips();
                     binding.inputStartDate.setText(trip.getStartDate());
                     binding.inputEndDate.setText(trip.getEndDate());
                     binding.inputTextDestination.setText(trip.getDestination());
@@ -124,6 +129,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
+                hideInput();
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             default: return super.onOptionsItemSelected(item);
@@ -151,6 +157,9 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
             case R.id.inputEndDate:
                 new DatePickerDialog(getContext(), endDate, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
+            case R.id.inputTextTripType:
+                getTrips();
+                return;
             case R.id.btnSaveTrip:
                 handleSave();
             default:
@@ -168,14 +177,15 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
                         } else {
                             service.updateTrip(tripId, getFormInput());
                         }
+                        hideInput();
                         Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                     }).setNegativeButton("No", null).show();
         }
     }
 
     private boolean validation(){
-        if (binding.inputTextName.getText().toString().equals("")) {
-            makeToast("Please enter the trip's name");
+        if (binding.inputTextTripType.getText().toString().equals("")) {
+            makeToast("Please select the trip's type");
             return false;
         }
 
@@ -186,6 +196,11 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
 
         if (binding.inputStartDate.getText().toString().equals("")) {
             makeToast("Please select the start date");
+            return false;
+        }
+
+        if (binding.inputTextParticipant.getText().toString().equals("")) {
+            makeToast("Please enter number of participants");
             return false;
         }
 
@@ -210,13 +225,14 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
     }
 
     private Trip getFormInput(){
-        String name = binding.inputTextName.getText().toString();
+        String name = binding.inputTextTripType.getText().toString();
         String destination = binding.inputTextDestination.getText().toString();
         String startDate = binding.inputStartDate.getText().toString();
         String endDate = binding.inputEndDate.getText().toString();
         boolean assessment = binding.switchRequiredAssessment.isChecked();
         String description = binding.inputTextDescription.getText().toString();
-        return new Trip(-1, name, destination, startDate, endDate, assessment, description);
+        int participants = Integer.parseInt(binding.inputTextParticipant.getText().toString());
+        return new Trip(-1, name, destination, startDate, endDate, assessment, participants, description);
     }
 
     private void updateDate(TextView dateView) {
@@ -227,6 +243,22 @@ public class TripFormFragment extends Fragment implements View.OnClickListener  
 
     private void makeToast(String toast) {
         Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
+    }
+
+    private void getTrips(){
+        AutoCompleteTextView tripView = binding.inputTextTripType;
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.trips);
+        tripView.setAdapter(adapter);
+        tripView.setOnClickListener(this);
+    }
+
+    private void hideInput(){
+        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = getView();
+        if(view == null){
+            view = new View(getActivity());
+        }
+        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }

@@ -9,6 +9,7 @@ public class Trip {
     private String startDate;
     private String endDate;
     private boolean requiredAssessment;
+    private int participants;
     private String description;
     private double total;
 
@@ -19,27 +20,30 @@ public class Trip {
         this.startDate = "";
         this.endDate = "";
         this.requiredAssessment = false;
+        this.participants = 0;
         this.description = "";
     }
 
-    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, String description) {
+    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants,  String description) {
         this.id = id;
         this.name = name;
         this.destination = destination;
         this.startDate = startDate;
         this.endDate = endDate;
         this.requiredAssessment = requiredAssessment;
+        this.participants = participants;
         this.description = description;
         this.total = 0;
     }
 
-    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, String description, Double total) {
+    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants, String description, Double total) {
         this.id = id;
         this.name = name;
         this.destination = destination;
         this.startDate = startDate;
         this.endDate = endDate;
         this.requiredAssessment = requiredAssessment;
+        this.participants = participants;
         this.description = description;
         this.total = total;
     }
@@ -92,6 +96,14 @@ public class Trip {
         this.requiredAssessment = requiredAssessment;
     }
 
+    public int getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(int participants) {
+        this.participants = participants;
+    }
+
     public double getTotal() {
         return total;
     }
@@ -106,5 +118,20 @@ public class Trip {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return "Trip{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", destination='" + destination + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", endDate='" + endDate + '\'' +
+                ", requiredAssessment=" + requiredAssessment +
+                ", participants=" + participants +
+                ", description='" + description + '\'' +
+                ", total=" + total +
+                '}';
     }
 }

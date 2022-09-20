@@ -61,10 +61,6 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
             Log.e("Trip", e.toString());
         }
 
-
-//        TextView name = binding.textExpenseTripName;
-//        name.setOnClickListener(this);
-
         RecyclerView rv = binding.expenseRecyclerView;
         rv.setHasFixedSize(true);
 
@@ -80,6 +76,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
                 trip -> {
+                    binding.textParticipants.setText("Number of Participant: " + trip.getParticipants());
                     binding.textExpenseTripName.setText(trip.getName());
                     binding.textTripStartDate.setText(trip.getStartDate());
                     binding.textTripEndDate.setText(trip.getEndDate());

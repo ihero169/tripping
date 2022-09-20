@@ -7,4 +7,6 @@ public class Constants {
     public static final String DATABASE_NAME = "MExpense";
     public static final String DATE_FORMAT = "dd MMM, yyyy";
 
+    public static final String[] categories = {"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};
+    public static final String[] trips = {"Meeting", "Conference", "Exhibit", "Event", "Team-building"};
 }

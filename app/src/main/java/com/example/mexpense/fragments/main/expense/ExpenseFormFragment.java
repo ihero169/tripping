@@ -1,6 +1,7 @@
 
 package com.example.mexpense.fragments.main.expense;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -31,13 +33,10 @@ import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.text.DateFormat;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
@@ -70,7 +69,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
         tripId = getArguments().getInt("tripId");
 
-        getCategories();
         TextInputEditText editDate = binding.inputDate;
         Button saveButton = binding.btnSaveExpense;
 
@@ -116,6 +114,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
+                hideInput();
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             case R.id.action_delete:
@@ -147,6 +146,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             case R.id.inputDate:
                 setDate();
                 break;
+            case R.id.inputTextCategories:
+                getCategories();
             default:
                 break;
         }
@@ -154,8 +155,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private void getCategories(){
         AutoCompleteTextView categoryView = binding.inputTextCategories;
-        String[] items = new String[]{"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};
-        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, items);
+        ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.categories);
         categoryView.setAdapter(adapter);
         categoryView.setOnClickListener(this);
     }
@@ -168,6 +168,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     Bundle bundle = new Bundle();
                     bundle.putInt("tripId", tripId);
                     Log.e("Action", "Delete expense: " + expenseId);
+
+                    hideInput();
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                 }).setNegativeButton("No", null).show();
@@ -187,6 +189,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         Bundle bundle = new Bundle();
                         bundle.putInt("tripId", tripId);
                         Log.e("Trip ID:", "handleSave: " + tripId);
+
+                        hideInput();
                         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                     }).setNegativeButton("No", null).show();
@@ -258,5 +262,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private void makeToast(String toast) {
         Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
+    }
+
+    private void hideInput(){
+        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        View view = getView();
+        if(view == null){
+            view = new View(getActivity());
+        }
+        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }
