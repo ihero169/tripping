@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,6 +34,7 @@ import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -48,6 +51,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private ExpenseService service;
     private int expenseId;
     private int tripId;
+
+    private TextInputLayout categoryLayout;
+    private TextInputLayout costLayout;
+    private TextInputLayout dateLayout;
+
+    private AutoCompleteTextView editCategory;
+    private TextInputEditText editCost;
+    private TextInputEditText editDate;
 
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
@@ -66,10 +77,15 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         } catch (Exception e) {
             expenseId = -1;
         }
-
         tripId = getArguments().getInt("tripId");
 
-        TextInputEditText editDate = binding.inputDate;
+        categoryLayout = binding.textInputLayoutCategory;
+        costLayout = binding.textInputLayoutCost;
+        dateLayout = binding.textInputLayoutDate;
+        editCategory = binding.inputTextCategories;
+        editCost = binding.inputCost;
+        editDate = binding.inputDate;
+
         Button saveButton = binding.btnSaveExpense;
 
         saveButton.setOnClickListener(this);
@@ -154,10 +170,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private void getCategories(){
-        AutoCompleteTextView categoryView = binding.inputTextCategories;
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.categories);
-        categoryView.setAdapter(adapter);
-        categoryView.setOnClickListener(this);
+        editCategory.setAdapter(adapter);
+        editCategory.setOnClickListener(this);
     }
 
     private void handleDelete(){
@@ -198,30 +213,38 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private boolean validation() {
-
+        boolean result = true;
         String startDate = getArguments().getString("startDate");
         String endDate = getArguments().getString("endDate");
 
-        if (binding.inputTextCategories.getText().toString().equals("")) {
-            makeToast("Please select a category");
-            return false;
+        if (editCategory.getText().toString().equals("")) {
+            categoryLayout.setError("Please select a category");
+            result = false;
+        } else {
+            categoryLayout.setError(null);
         }
 
-        if (binding.inputDate.getText().toString().equals("")) {
-            makeToast("Please select a date");
-            return false;
+        if (editDate.getText().toString().equals("")) {
+            dateLayout.setError("Please select a date");
+            result = false;
+        } else {
+            if(!dateValidation(startDate, endDate, binding.inputDate.getText().toString())){
+                dateLayout.setError("Expense date must be within " + startDate + " and " + endDate);
+                result = false;
+            }
+            else {
+                dateLayout.setError(null);
+            }
         }
 
-        if(!dateValidation(startDate, endDate, binding.inputDate.getText().toString())){
-            makeToast("Expense date must be within " + startDate + " and " + endDate);
-            return false;
+        if (Float.parseFloat(editCost.getText().toString()) == 0.0) {
+            costLayout.setError("Please enter a cost");
+            result = false;
+        } else {
+            costLayout.setError(null);
         }
 
-        if (binding.inputCost.getText().toString().equals("")) {
-            makeToast("Please enter the expense's cost");
-            return false;
-        }
-        return true;
+        return result;
     }
 
     private boolean dateValidation(String startStr, String endStr, String expenseStr){
@@ -233,17 +256,17 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private Expense getFormInput() {
-        String category = binding.inputTextCategories.getText().toString();
-        String date = binding.inputDate.getText().toString();
+        String category = editCategory.getText().toString();
+        String date = editDate.getText().toString();
         String comment = binding.inputTextComment.getText().toString();
-        double cost = Double.parseDouble(binding.inputCost.getText().toString());
+        double cost = Double.parseDouble(editCost.getText().toString());
         return new Expense(-1, category, cost, date, comment, tripId);
     }
 
     private void updateDate() {
         String format = Constants.DATE_FORMAT;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
-        binding.inputDate.setText(dateFormat.format(myCalendar.getTime()));
+        editDate.setText(dateFormat.format(myCalendar.getTime()));
     }
     public void setDate() {
         if(expenseId == -1){
@@ -260,10 +283,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         myCalendar.set(Calendar.DAY_OF_MONTH, day);
     }
 
-    private void makeToast(String toast) {
-        Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
-    }
-
     private void hideInput(){
         InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
         View view = getView();
@@ -272,4 +291,5 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         }
         manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
+
 }

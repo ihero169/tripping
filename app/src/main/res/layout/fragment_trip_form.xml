@@ -21,16 +21,17 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutTripType"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:focusable="false"
+
             android:focusableInTouchMode="false"
-
             android:fontFamily="@font/founders_grotesk_regular"
-            android:hint="Select A Trip Type"
 
+            android:hint="Select A Trip Type"
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -45,6 +46,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutDestination"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -64,13 +66,13 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/linearLayout"
+            android:id="@+id/linearLayoutDate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp">
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout"
+                android:id="@+id/layoutStartDate"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -80,9 +82,9 @@
                 android:hint="Start Date"
                 app:boxCornerRadiusBottomStart="10dp"
                 app:boxCornerRadiusTopStart="10dp"
-                app:layout_constraintBaseline_toBaselineOf="@+id/textInputLayout2"
-                app:layout_constraintEnd_toStartOf="@+id/textInputLayout2"
+                app:layout_constraintEnd_toStartOf="@+id/layoutEndDate"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 app:startIconDrawable="@drawable/ic_date">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -91,16 +93,18 @@
                     android:layout_height="wrap_content"
 
                     android:clickable="false"
+
                     android:cursorVisible="false"
                     android:focusable="false"
-
                     android:focusableInTouchMode="false"
                     android:fontFamily="@font/founders_grotesk_regular"
+
+                    android:maxLines="1"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/textInputLayout2"
+                android:id="@+id/layoutEndDate"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -111,9 +115,10 @@
                 app:boxCornerRadiusBottomEnd="10dp"
                 app:boxCornerRadiusTopEnd="10dp"
                 app:circularflow_defaultRadius="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/textInputLayout"
+                app:layout_constraintStart_toEndOf="@+id/layoutStartDate"
+                app:layout_constraintTop_toTopOf="parent"
+
                 app:startIconDrawable="@drawable/ic_date">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -122,16 +127,19 @@
                     android:layout_height="wrap_content"
 
                     android:clickable="false"
+
                     android:cursorVisible="false"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
-
                     android:fontFamily="@font/founders_grotesk_regular"
+
+                    android:maxLines="1"
                     android:textSize="14sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutParticipants"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
