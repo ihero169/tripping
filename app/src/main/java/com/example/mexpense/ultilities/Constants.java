@@ -3,8 +3,6 @@ package com.example.mexpense.ultilities;
 public class Constants {
     public static final int NEW_EXPENSE = -1;
     public static final int NEW_TRIP = -1;
-    public static final String SQL = "SQL";
-    public static final String DATABASE_NAME = "MExpense";
     public static final String DATE_FORMAT = "dd MMM, yyyy";
 
     public static final String[] categories = {"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};

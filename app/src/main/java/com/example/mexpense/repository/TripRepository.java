@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.ultilities.Constants;
 
@@ -75,10 +77,8 @@ public class TripRepository extends SQLiteOpenHelper {
             int participant = Integer.parseInt(c.getString(6));
             String description = c.getString(7);
             Double total = Double.parseDouble(c.getString(8));
-            Log.w(Constants.SQL, assessment ? "true" : "false");
             Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, participant, description, total);
             trips.add(t);
-            Log.w(Constants.SQL, t.toString());
         }
         c.close();
         return trips;
@@ -100,7 +100,6 @@ public class TripRepository extends SQLiteOpenHelper {
             t.setTotal(Double.parseDouble(c.getString(8)));
         }
         c.close();
-        Log.w(Constants.SQL, t.toString());
         return t;
     }
 
@@ -148,10 +147,16 @@ public class TripRepository extends SQLiteOpenHelper {
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
 
-    public List<Trip> searchTripByName(String keyword) {
+    public void deleteAll() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + TABLE_NAME);
+        db.execSQL("DELETE FROM expenses_table");
+    }
+
+    public List<Trip> searchTripByDestination(String d) {
         List<Trip> trips = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + " LIKE '%" + keyword + "%'", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_DESTINATION + " LIKE '%" + d + "%'", null);
         while (c.moveToNext()){
             String name = c.getString(1);
             String destination = c.getString(2);
@@ -163,14 +168,8 @@ public class TripRepository extends SQLiteOpenHelper {
             Double total = Double.parseDouble(c.getString(8));
             Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, participant, description, total);
             trips.add(t);
-            Log.w(Constants.SQL, t.toString());
         }
         c.close();
         return trips;
-    }
-
-    public void deleteAll() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM " + TABLE_NAME);
     }
 }

@@ -78,7 +78,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         }
 
         editTripType = binding.inputTextTripType;
-        editDestination = binding.inputTextDescription;
+        editDestination = binding.inputTextDestination;
         editDescription = binding.inputTextDescription;
         editParticipant = binding.inputTextParticipant;
         assessment = binding.switchRequiredAssessment;

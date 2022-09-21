@@ -52,7 +52,7 @@ public class TripService {
         repository.deleteAll();
     }
 
-    public void searchTripByName(MutableLiveData<List<Trip>> tripList, String s) {
-        tripList.setValue(repository.searchTripByName(s));
+    public void searchTripByDestination(MutableLiveData<List<Trip>> trip, String destination) {
+        trip.setValue(repository.searchTripByDestination(destination));
     }
 }

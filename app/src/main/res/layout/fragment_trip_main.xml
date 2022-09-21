@@ -21,63 +21,129 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+    <Button
+        android:id="@+id/btnSortId"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/ic_sort"
+        android:padding="10dp"
+        app:layout_constraintEnd_toStartOf="@+id/btnReset"
+        app:layout_constraintTop_toBottomOf="@+id/layoutStartDateSort"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+    <Button
+        android:id="@+id/btnReset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:text="Reset"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutStartDateSort" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="22dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="@font/founders_grotesk_medium"
+        android:text="Sort"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toStartOf="@+id/btnSortId"
+        app:layout_constraintTop_toBottomOf="@+id/layoutStartDateSort" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/tripRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tripSearchView" />
+
+    <SearchView
+        android:id="@+id/tripSearchView"
+        android:layout_width="wrap_content"
+        android:layout_height="42dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="12dp"
+        android:elevation="4dp"
+
+        android:iconifiedByDefault="true"
+        android:maxWidth="185dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/layoutTripSort"
+        app:queryHint="Enter a destination">
+
+    </SearchView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutTripSort"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/founders_grotesk_regular"
+        android:hint="Trip Type"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
+        <AutoCompleteTextView
+            android:id="@+id/inputSortTrip"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:layout_marginEnd="10dp"
-            android:fontFamily="@font/founders_grotesk_medium"
-            android:text="Sort by ID"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toStartOf="@+id/btnSort"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:clickable="false"
+            android:cursorVisible="false"
 
-        <SearchView
-            android:id="@+id/tripSearchView"
-            android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="17dp"
-            android:elevation="4dp"
-            android:iconifiedByDefault="true"
-            android:maxWidth="200dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:fontFamily="@font/founders_grotesk_regular"
+            android:inputType="none"
 
-        </SearchView>
+            tools:ignore="TouchTargetSizeCheck" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/tripRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:padding="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tripSearchView" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/layoutStartDateSort"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="170dp"
+        android:layout_height="wrap_content"
 
-        <Button
-            android:id="@+id/btnSort"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginTop="25dp"
-            android:layout_marginEnd="25dp"
-            android:background="@drawable/ic_sort"
-            android:padding="10dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:hint="Start Date"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:startIconDrawable="@drawable/ic_date">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/inputStartDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:clickable="false"
+            android:cursorVisible="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:fontFamily="@font/founders_grotesk_regular"
+
+            android:maxLines="1"
+            android:textSize="14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
