@@ -42,6 +42,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -55,11 +57,15 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private TripService service;
 
     private DatePickerDialog.OnDateSetListener startDate;
+    private DatePickerDialog.OnDateSetListener endDate;
+
     final Calendar myCalendar = Calendar.getInstance();
+
     private TextInputEditText editStartDate;
+    private TextInputEditText editEndDate;
+    private TextInputEditText editDestination;
 
     private AutoCompleteTextView sortTripType;
-    private SearchView searchView;
 
     public static TripMainFragment newInstance() {
         return new TripMainFragment();
@@ -93,35 +99,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         Button resetBtn = binding.btnReset;
         resetBtn.setOnClickListener(this);
 
-        searchView = binding.tripSearchView;
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                searchTrip(s);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                searchTrip(s);
-                return true;
-            }
-
-            public void searchTrip(String s){
-                service.getTrips(mViewModel.tripList);
-                mViewModel.narrowByDestination(s.toLowerCase());
-            }
-        });
 
         editStartDate = binding.inputStartDate;
         editStartDate.setOnClickListener(this);
-        startDate = (datePicker, year, month, day) -> {
-            myCalendar.set(Calendar.YEAR, year);
-            myCalendar.set(Calendar.MONTH, month);
-            myCalendar.set(Calendar.DAY_OF_MONTH, day);
-            updateDate(binding.inputStartDate);
-        };
-
         editStartDate.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -133,12 +113,40 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String date = editStartDate.getText().toString();
-                if(date != ""){
-                    mViewModel.narrowByDate(date);
-                }
+                sortDate();
             }
         });
+
+        startDate = (datePicker, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            updateDate(binding.inputStartDate);
+        };
+
+        editEndDate = binding.inputEndDate;
+        editEndDate.setOnClickListener(this);
+        editEndDate.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                service.getTrips(mViewModel.tripList);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                sortDate();
+            }
+        });
+
+        endDate = (datePicker, year, month, day) -> {
+            myCalendar.set(Calendar.YEAR, year);
+            myCalendar.set(Calendar.MONTH, month);
+            myCalendar.set(Calendar.DAY_OF_MONTH, day);
+            updateDate(binding.inputEndDate);
+        };
 
         sortTripType = binding.inputSortTrip;
         sortTripType.setOnClickListener(this);
@@ -155,8 +163,27 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             @Override
             public void afterTextChanged(Editable editable) {
                 String type = sortTripType.getText().toString();
-                if(type != ""){
+                if(type == ""){
                     mViewModel.narrowByType(type);
+                }
+            }
+        });
+
+        editDestination = binding.editDestination;
+        editDestination.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                service.getTrips(mViewModel.tripList);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String destination = editDestination.getText().toString();
+                if(destination != ""){
+                    mViewModel.narrowByDestination(destination);
                 }
             }
         });
@@ -206,6 +233,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             case R.id.inputStartDate:
                 new DatePickerDialog(getContext(), startDate, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
+            case R.id.inputEndDate:
+                new DatePickerDialog(getContext(), endDate, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
+                break;
             case R.id.inputSortTrip:
                 getTrips();
                 break;
@@ -221,6 +251,34 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         Bundle bundle = new Bundle();
         bundle.putInt("tripId", tripId);
         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
+    }
+
+    private void sortDate(){
+        String startDate = editStartDate.getText().toString();
+        String endDate = editEndDate.getText().toString();
+
+        if(!startDate.equals("") && startDate != null && !endDate.equals("") && endDate != null){
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+            LocalDate start = LocalDate.parse(startDate, formatter);
+            LocalDate end = LocalDate.parse(endDate, formatter);
+
+            Log.e("DATE CHECKING", "sortDate: " + start.isBefore(end));
+            if(start.isAfter(end)){
+                binding.layoutStartDateSort.setError("Invalid start date");
+                return;
+            } else {
+                binding.layoutStartDateSort.setError(null);
+            }
+        }
+
+
+        if(startDate.equals("") || startDate == null){
+            return;
+        } else mViewModel.narrowByStartDate(startDate);
+
+        if(endDate.equals("") || endDate == null){
+            return;
+        } else mViewModel.narrowByEndDate(endDate);
     }
 
     private void addTrip(){
@@ -256,7 +314,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private void resetNarrowDown(){
         sortTripType.setText("");
         editStartDate.setText("");
-        searchView.setIconified(true);
+        editEndDate.setText("");
+        editDestination.setText("");
+        binding.layoutStartDateSort.setError(null);
         hideInput();
         service.getTrips(mViewModel.tripList);
     }

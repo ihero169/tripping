@@ -270,10 +270,6 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         dateView.setText(dateFormat.format(myCalendar.getTime()));
     }
 
-    private void makeToast(String toast) {
-        Toast.makeText(getContext(), toast, Toast.LENGTH_SHORT).show();
-    }
-
     private void getTrips() {
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.trips);
         editTripType.setAdapter(adapter);

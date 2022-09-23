@@ -1,7 +1,6 @@
 package com.example.mexpense.fragments.main.expense;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,11 +53,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
 
         try{
             tripId = getArguments().getInt("tripId");
-            Log.i("Trip", "onCreateView: " + tripId);
-        } catch (Exception e){
-            Log.e("Trip", "Failed to get tripId");
-            Log.e("Trip", e.toString());
-        }
+        } catch (Exception e){}
 
         RecyclerView rv = binding.expenseRecyclerView;
         rv.setHasFixedSize(true);

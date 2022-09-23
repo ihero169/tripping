@@ -47,8 +47,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private ExpenseFormViewModel mViewModel;
     final Calendar myCalendar = Calendar.getInstance();
     private FragmentExpenseFormBinding binding;
-    DatePickerDialog.OnDateSetListener date;
     private ExpenseService service;
+
+    DatePickerDialog.OnDateSetListener date;
+
     private int expenseId;
     private int tripId;
 
