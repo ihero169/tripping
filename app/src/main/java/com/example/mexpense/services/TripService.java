@@ -14,8 +14,8 @@ import java.util.List;
 
 public class TripService {
     TripRepository repository;
-    DateTimeFormatter android_formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
-    DateTimeFormatter sql_formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
+    DateTimeFormatter android_format = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+    DateTimeFormatter sql_format = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
 
     public TripService(Context context) {
         repository = new TripRepository(context);
@@ -23,9 +23,9 @@ public class TripService {
 
     public void getTrips(MutableLiveData<List<Trip>> tripList) {
         List<Trip> trips = repository.getTrips();
-        for (Trip t : trips
-        ) {
-            ConvertDateToAndroid(t);
+        for (Trip t : trips) {
+            t.setStartDate(ConvertDate(t.getStartDate(), sql_format, android_format));
+            t.setEndDate(ConvertDate(t.getEndDate(), sql_format, android_format));
         }
         tripList.setValue(trips);
     }
@@ -34,18 +34,24 @@ public class TripService {
         Trip t;
         if (id == -1) {
             t = new Trip();
-        } else t = repository.getTripById(id);
-        ConvertDateToAndroid(t);
+        } else {
+            t = repository.getTripById(id);
+            t.setStartDate(ConvertDate(t.getStartDate(), sql_format, android_format));
+            t.setEndDate(ConvertDate(t.getEndDate(), sql_format, android_format));
+        }
+
         trip.setValue(t);
     }
 
     public void addTrip(Trip trip) {
-        ConvertDateToSQL(trip);
+        trip.setStartDate(ConvertDate(trip.getStartDate(), android_format, sql_format));
+        trip.setEndDate(ConvertDate(trip.getEndDate(), android_format, sql_format));
         repository.addTrip(trip);
     }
 
     public void updateTrip(int id, Trip trip) {
-        ConvertDateToSQL(trip);
+        trip.setStartDate(ConvertDate(trip.getStartDate(), android_format, sql_format));
+        trip.setEndDate(ConvertDate(trip.getEndDate(), android_format, sql_format));
         repository.updateTrip(id, trip);
     }
 
@@ -65,19 +71,25 @@ public class TripService {
         trip.setValue(repository.searchTripByDestination(destination));
     }
 
-    private void ConvertDateToAndroid(Trip trip) {
-        LocalDate androidStartDate = LocalDate.parse(trip.getStartDate(), android_formatter);
-        LocalDate androidEndDate = LocalDate.parse(trip.getEndDate(), android_formatter);
+    public void narrowByDate(MutableLiveData<List<Trip>>  trips, String start, String end){
+        if(start.equals("")){
+            start = "01 Jan, 1940";
+        }
 
-        trip.setStartDate(sql_formatter.format(androidStartDate).toString());
-        trip.setEndDate(sql_formatter.format(androidEndDate).toString());
+        if(end.equals("")){
+            end = "01 Jan, 2099";
+        }
+
+        trips.setValue(
+                repository.narrowByDate(
+                        ConvertDate(start, android_format, sql_format),
+                        ConvertDate(end, android_format, sql_format)
+                )
+        );
     }
 
-    private void ConvertDateToSQL(Trip trip) {
-        LocalDate sqlStartDate = LocalDate.parse(trip.getStartDate(), sql_formatter);
-        LocalDate sqlEndDate = LocalDate.parse(trip.getEndDate(), sql_formatter);
-
-        trip.setStartDate(sql_formatter.format(sqlStartDate).toString());
-        trip.setEndDate(sql_formatter.format(sqlEndDate).toString());
+    private String ConvertDate(String source, DateTimeFormatter from, DateTimeFormatter target) {
+        LocalDate date = LocalDate.parse(source, from);
+        return target.format(date);
     }
 }

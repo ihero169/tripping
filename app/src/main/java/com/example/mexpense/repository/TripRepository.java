@@ -7,10 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import androidx.lifecycle.MutableLiveData;
-
 import com.example.mexpense.entity.Trip;
-import com.example.mexpense.ultilities.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,23 +62,10 @@ public class TripRepository extends SQLiteOpenHelper {
     }
 
     public List<Trip> getTrips() {
-        List<Trip> trips = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        while (c.moveToNext()){
-            String name = c.getString(1);
-            String destination = c.getString(2);
-            String startDate = c.getString(3);
-            String endDate = c.getString(4);
-            boolean assessment = Integer.parseInt(c.getString(5)) == 1;
-            int participant = Integer.parseInt(c.getString(6));
-            String description = c.getString(7);
-            Double total = Double.parseDouble(c.getString(8));
-            Trip t = new Trip(Integer.parseInt(c.getString(0)),name, destination, startDate, endDate, assessment, participant, description, total);
-            trips.add(t);
-        }
-        c.close();
-        return trips;
+        String query = "SELECT * FROM " + TABLE_NAME;
+        Cursor c = db.rawQuery(query, null);
+        return getList(c);
     }
 
     public Trip getTripById(int id) {
@@ -154,9 +138,28 @@ public class TripRepository extends SQLiteOpenHelper {
     }
 
     public List<Trip> searchTripByDestination(String d) {
-        List<Trip> trips = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_DESTINATION + " LIKE '%" + d + "%'", null);
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_DESTINATION + " LIKE '%" + d + "%'";
+        Cursor c = db.rawQuery(query, null);
+        return getList(c);
+    }
+
+    public List<Trip> searchByType(String type){
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + "=" + type;
+        Cursor c = db.rawQuery(query, null);
+        return getList(c);
+    }
+
+    public List<Trip> narrowByDate(String start, String end) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + " BETWEEN " + start + " AND " + end;
+        Cursor c = db.rawQuery(query, null);
+        return getList(c);
+    }
+
+    public List<Trip> getList(Cursor c){
+        List<Trip> trips = new ArrayList<>();
         while (c.moveToNext()){
             String name = c.getString(1);
             String destination = c.getString(2);
@@ -172,4 +175,6 @@ public class TripRepository extends SQLiteOpenHelper {
         c.close();
         return trips;
     }
+
+
 }
