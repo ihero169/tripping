@@ -4,6 +4,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
@@ -16,6 +17,7 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,11 +27,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.SearchView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.mexpense.R;
@@ -38,12 +41,11 @@ import com.example.mexpense.databinding.FragmentTripMainBinding;
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.services.TripService;
 import com.example.mexpense.ultilities.Constants;
+import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -66,6 +68,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private TextInputEditText editDestination;
 
     private AutoCompleteTextView sortTripType;
+
+    private ImageButton searchToggle;
+    private Button resetBtn;
+    private Button sortBtn;
+
+    private boolean isOpen = false;
 
     public static TripMainFragment newInstance() {
         return new TripMainFragment();
@@ -93,27 +101,27 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         );
         service.getTrips(mViewModel.tripList);
 
-        Button sortBtn = binding.btnSortId;
+        sortBtn = binding.btnSortId;
         sortBtn.setOnClickListener(this);
 
-        Button resetBtn = binding.btnReset;
+        resetBtn = binding.btnReset;
         resetBtn.setOnClickListener(this);
 
+        searchToggle = binding.btnSearchToggle;
+        searchToggle.setOnClickListener(this);
 
         editStartDate = binding.inputStartDate;
         editStartDate.setOnClickListener(this);
         editStartDate.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                service.getTrips(mViewModel.tripList);
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
-                sortDate();
+                service.searchByDate(mViewModel.tripList, editStartDate.getText().toString(), editEndDate.getText().toString());
             }
         });
 
@@ -128,16 +136,14 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editEndDate.setOnClickListener(this);
         editEndDate.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                service.getTrips(mViewModel.tripList);
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void afterTextChanged(Editable editable) {
-                sortDate();
+                service.searchByDate(mViewModel.tripList, editStartDate.getText().toString(), editEndDate.getText().toString());
             }
         });
 
@@ -153,18 +159,18 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         getTrips();
         sortTripType.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                service.getTrips(mViewModel.tripList);
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
                 String type = sortTripType.getText().toString();
-                if(type == ""){
-                    mViewModel.narrowByType(type);
+                Log.i("Search", "Keyword: " + type);
+                if(type != ""){
+                    service.searchByType(mViewModel.tripList, type);
                 }
             }
         });
@@ -172,9 +178,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editDestination = binding.editDestination;
         editDestination.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                service.getTrips(mViewModel.tripList);
-            }
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
@@ -183,7 +187,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             public void afterTextChanged(Editable editable) {
                 String destination = editDestination.getText().toString();
                 if(destination != ""){
-                    mViewModel.narrowByDestination(destination);
+                    service.searchByDestination(mViewModel.tripList, destination);
                 }
             }
         });
@@ -241,6 +245,10 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                 break;
             case R.id.btnReset:
                 resetNarrowDown();
+                break;
+            case R.id.btnSearchToggle:
+                toggleSearchField();
+                break;
             default:
                 break;
         }
@@ -253,32 +261,15 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
     }
 
-    private void sortDate(){
-        String startDate = editStartDate.getText().toString();
-        String endDate = editEndDate.getText().toString();
-
-        if(!startDate.equals("") && startDate != null && !endDate.equals("") && endDate != null){
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
-            LocalDate start = LocalDate.parse(startDate, formatter);
-            LocalDate end = LocalDate.parse(endDate, formatter);
-
-            Log.e("DATE CHECKING", "sortDate: " + start.isBefore(end));
-            if(start.isAfter(end)){
-                binding.layoutStartDateSort.setError("Invalid start date");
-                return;
-            } else {
-                binding.layoutStartDateSort.setError(null);
-            }
+    private void toggleSearchField(){
+        if(isOpen){
+            binding.mainLayout.animate().translationY(-binding.sortLayout.getHeight()).setDuration(500);
+            binding.btnSearchToggle.setImageResource(R.drawable.ic_filter);
+        } else {
+            binding.mainLayout.animate().translationY(0).setDuration(500);
+            binding.btnSearchToggle.setImageResource(R.drawable.ic_cancel);
         }
-
-
-        if(startDate.equals("") || startDate == null){
-            return;
-        } else mViewModel.narrowByStartDate(startDate);
-
-        if(endDate.equals("") || endDate == null){
-            return;
-        } else mViewModel.narrowByEndDate(endDate);
+        isOpen = !isOpen;
     }
 
     private void addTrip(){
@@ -296,7 +287,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                     mViewModel.tripList.setValue(newList);
                     Log.i("Database", "Database wiped");
                 }).setNegativeButton("No", null).show();
-
     }
 
     private void updateDate(TextView dateView) {
@@ -317,16 +307,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editEndDate.setText("");
         editDestination.setText("");
         binding.layoutStartDateSort.setError(null);
-        hideInput();
+        Utilities.hideInput(getActivity(), getView());
         service.getTrips(mViewModel.tripList);
-    }
-
-    private void hideInput(){
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = getView();
-        if(view == null){
-            view = new View(getActivity());
-        }
-        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 }

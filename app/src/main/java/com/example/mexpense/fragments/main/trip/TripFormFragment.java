@@ -1,6 +1,5 @@
 package com.example.mexpense.fragments.main.trip;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -10,13 +9,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,6 +28,7 @@ import com.example.mexpense.databinding.FragmentTripFormBinding;
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.services.TripService;
 import com.example.mexpense.ultilities.Constants;
+import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
@@ -142,7 +140,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                hideInput();
+                Utilities.hideInput(getActivity(), getView());
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             default:
@@ -191,7 +189,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                         } else {
                             service.updateTrip(tripId, getFormInput());
                         }
-                        hideInput();
+                        Utilities.hideInput(getActivity(), getView());
                         Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                     }).setNegativeButton("No", null).show();
         }
@@ -275,14 +273,4 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         editTripType.setAdapter(adapter);
         editTripType.setOnClickListener(this);
     }
-
-    private void hideInput() {
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = getView();
-        if (view == null) {
-            view = new View(getActivity());
-        }
-        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
 }

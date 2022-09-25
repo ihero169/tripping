@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mexpense.R;
 import com.example.mexpense.databinding.TripListItemBinding;
 import com.example.mexpense.entity.Trip;
+import com.example.mexpense.ultilities.Utilities;
 
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         }
 
         public void bindData(Trip trip){
-            binding.textStartDate.setText(trip.getStartDate());
-            binding.textEndDate.setText(trip.getEndDate());
+            binding.textStartDate.setText(Utilities.convertDate(trip.getStartDate(), false));
+            binding.textEndDate.setText(Utilities.convertDate(trip.getEndDate(), false));
             binding.textTripDestination.setText(trip.getDestination());
             binding.textTripName.setText(trip.getName());
             String s = "$" + trip.getTotal();

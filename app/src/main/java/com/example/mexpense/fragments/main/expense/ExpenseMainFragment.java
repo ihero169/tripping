@@ -1,5 +1,6 @@
 package com.example.mexpense.fragments.main.expense;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +36,6 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
     private ExpenseAdapter adapter;
-    private ExpenseService expenseService;
     private TripService tripService;
     private int tripId;
 
@@ -43,17 +43,16 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         return new ExpenseMainFragment();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExpenseMainViewModel.class);
         binding = FragmentExpenseMainBinding.inflate(inflater, container, false);
-        expenseService = new ExpenseService(getContext());
         tripService = new TripService(getContext());
+        ExpenseService expenseService = new ExpenseService(getContext());
 
-        try{
-            tripId = getArguments().getInt("tripId");
-        } catch (Exception e){}
+        tripId = getArguments() != null ? getArguments().getInt("tripId") : -1;
 
         RecyclerView rv = binding.expenseRecyclerView;
         rv.setHasFixedSize(true);

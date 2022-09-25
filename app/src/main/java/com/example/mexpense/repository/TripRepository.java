@@ -137,7 +137,7 @@ public class TripRepository extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM expenses_table");
     }
 
-    public List<Trip> searchTripByDestination(String d) {
+    public List<Trip> searchByDestination(String d) {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_DESTINATION + " LIKE '%" + d + "%'";
         Cursor c = db.rawQuery(query, null);
@@ -146,14 +146,14 @@ public class TripRepository extends SQLiteOpenHelper {
 
     public List<Trip> searchByType(String type){
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + "=" + type;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + "='" + type + "'";
         Cursor c = db.rawQuery(query, null);
         return getList(c);
     }
 
     public List<Trip> narrowByDate(String start, String end) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + " BETWEEN " + start + " AND " + end;
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_START_DATE + " >= '" + start + "' AND " + COLUMN_END_DATE + " <= '" + end + "'";
         Cursor c = db.rawQuery(query, null);
         return getList(c);
     }

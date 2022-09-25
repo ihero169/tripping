@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.mexpense.R;
 import com.example.mexpense.databinding.ExpenseListItemBinding;
 import com.example.mexpense.entity.Expense;
+import com.example.mexpense.ultilities.Utilities;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -44,8 +45,8 @@ public class ExpenseAdapter extends RecyclerView.Adapter<ExpenseAdapter.ExpenseV
         }
 
         public void bindData(Expense expense) {
-            binding.textCost.setText("$ " + String.valueOf(expense.getCost()));
-            binding.textDate.setText(expense.getDate());
+            binding.textCost.setText("$ " + expense.getCost());
+            binding.textDate.setText(Utilities.convertDate(expense.getDate(), false));
             binding.textCategory.setText(expense.getCategory());
             binding.iconCategory.setImageResource(getIcon(expense.getCategory()));
             binding.getRoot().setOnClickListener( v-> listener.onItemClick(expense.getId()));

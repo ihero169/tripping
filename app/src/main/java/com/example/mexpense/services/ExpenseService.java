@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.repository.ExpenseRepository;
+import com.example.mexpense.ultilities.Utilities;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class ExpenseService {
     }
 
     public void updateExpense(int id, Expense expense) {
+        expense.setDate(Utilities.convertDate(expense.getDate(), true));
         repository.updateExpense(id, expense);
     }
 
@@ -38,6 +40,7 @@ public class ExpenseService {
     }
 
     public void addExpense(Expense expense) {
+        expense.setDate(Utilities.convertDate(expense.getDate(), true));
         repository.addExpense(expense);
     }
 

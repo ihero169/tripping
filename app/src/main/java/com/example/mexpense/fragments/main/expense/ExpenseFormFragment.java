@@ -1,12 +1,9 @@
 
 package com.example.mexpense.fragments.main.expense;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,11 +11,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,6 +28,7 @@ import com.example.mexpense.databinding.FragmentExpenseFormBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.ultilities.Constants;
+import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -132,7 +128,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                hideInput();
+                Utilities.hideInput(getActivity(), getView());
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             case R.id.action_delete:
@@ -186,7 +182,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     bundle.putInt("tripId", tripId);
                     Log.e("Action", "Delete expense: " + expenseId);
 
-                    hideInput();
+                    Utilities.hideInput(getActivity(), getView());
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                 }).setNegativeButton("No", null).show();
@@ -207,7 +203,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         bundle.putInt("tripId", tripId);
                         Log.e("Trip ID:", "handleSave: " + tripId);
 
-                        hideInput();
+                        Utilities.hideInput(getActivity(), getView());
                         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                     }).setNegativeButton("No", null).show();
@@ -283,15 +279,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         myCalendar.set(Calendar.YEAR, year);
         myCalendar.set(Calendar.MONTH, month);
         myCalendar.set(Calendar.DAY_OF_MONTH, day);
-    }
-
-    private void hideInput(){
-        InputMethodManager manager = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        View view = getView();
-        if(view == null){
-            view = new View(getActivity());
-        }
-        manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }
