@@ -5,7 +5,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,9 +46,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
-public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
+public class ExpenseFormFragment extends Fragment implements View.OnClickListener, LocationListener {
 
     private ExpenseFormViewModel mViewModel;
     final Calendar myCalendar = Calendar.getInstance();
@@ -63,6 +68,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private AutoCompleteTextView editCategory;
     private TextInputEditText editCost;
     private TextInputEditText editDate;
+    private TextInputEditText editAmount;
 
     private FusedLocationProviderClient locationClient;
 
@@ -87,6 +93,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
                     Constants.REQUEST_PERMISSION_FINE_LOCATION
             );
+        } else {
+            getLocation();
         }
 
         try {
@@ -94,6 +102,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         } catch (Exception e) {
             expenseId = -1;
         }
+
         tripId = getArguments().getInt("tripId");
 
         categoryLayout = binding.textInputLayoutCategory;
@@ -102,6 +111,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         editCategory = binding.inputTextCategories;
         editCost = binding.inputCost;
         editDate = binding.inputDate;
+        editAmount = binding.inputAmount;
 
         Button saveButton = binding.btnSaveExpense;
 
@@ -120,6 +130,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     getCategories();
                     binding.inputDate.setText(expense.getDate());
                     binding.inputCost.setText(String.valueOf(expense.getCost()));
+                    binding.inputAmount.setText(String.valueOf(expense.getAmount()));
                 }
         );
         service.getExpenseById(mViewModel.expense, expenseId);
@@ -212,6 +223,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation").setMessage("Are you sure?")
                     .setPositiveButton("Yes", (arg0, arg1) -> {
+                        getLocation();
                         if (expenseId == -1) {
                             service.addExpense(getFormInput());
                         } else {
@@ -221,8 +233,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         Bundle bundle = new Bundle();
                         bundle.putInt("tripId", tripId);
                         Log.e("Trip ID:", "handleSave: " + tripId);
-
-                        getLocation();
 
                         Utilities.hideInput(getActivity(), getView());
                         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
@@ -238,6 +248,13 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
         if (editCategory.getText().toString().equals("")) {
             categoryLayout.setError("Please select a category");
+            result = false;
+        } else {
+            categoryLayout.setError(null);
+        }
+
+        if (editAmount.getText().toString().equals("")) {
+            binding.textInputLayoutAmount.setError("Please enter the amount");
             result = false;
         } else {
             categoryLayout.setError(null);
@@ -267,10 +284,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private boolean dateValidation(String startStr, String endStr, String expenseStr){
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
-        LocalDate startDate = LocalDate.parse(startStr, formatter);
-        LocalDate endDate = LocalDate.parse(endStr, formatter);
-        LocalDate expenseDate = LocalDate.parse(expenseStr, formatter);
+        DateTimeFormatter sql = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
+        LocalDate startDate = LocalDate.parse(startStr, sql);
+        LocalDate endDate = LocalDate.parse(endStr, sql);
+        LocalDate expenseDate = LocalDate.parse(expenseStr, sql);
         return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate) || expenseDate.isEqual(startDate)  || expenseDate.isEqual(endDate);
     }
 
@@ -279,19 +296,24 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         String date = editDate.getText().toString();
         String comment = binding.inputTextComment.getText().toString();
         double cost = Double.parseDouble(editCost.getText().toString());
-        return new Expense(-1, category, cost, date, comment, tripId);
+        int amount = Integer.parseInt(editAmount.getText().toString());
+        getLocation();
+        return new Expense(-1, category, cost, amount, date, comment, tripId, latitude, longitude);
     }
 
     private void updateDate() {
-        String format = Constants.DATE_FORMAT;
+        String format = Constants.DATE_FORMAT_DATABASE;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         editDate.setText(dateFormat.format(myCalendar.getTime()));
     }
     public void setDate() {
+        DateTimeFormatter source = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
         if(expenseId == -1){
-            DateTimeFormatter source = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
             LocalDate startDate = LocalDate.parse(getArguments().getString("startDate"), source);
             setCalendar(startDate.getYear(), startDate.getMonthValue() - 1, startDate.getDayOfMonth());
+        } else {
+            LocalDate currentDate = LocalDate.parse(mViewModel.expense.getValue().getDate(), source);
+            setCalendar(currentDate.getYear(), currentDate.getMonthValue() - 1, currentDate.getDayOfMonth());
         }
         new DatePickerDialog(getContext(), date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -301,12 +323,55 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         myCalendar.set(Calendar.MONTH, month);
         myCalendar.set(Calendar.DAY_OF_MONTH, day);
     }
+
+    private final LocationListener locationListener = new LocationListener() {
+        public void onLocationChanged(Location location) {
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+    };
+
     @SuppressLint("MissingPermission")
     private void getLocation(){
-        locationClient.getLastLocation().addOnSuccessListener(getActivity(),
-                location -> {
-                    latitude = location.getLatitude();
-                    longitude = location.getLongitude();
-                });
+        LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
+
+        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if(location != null){
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+        }
+    }
+
+
+    @Override
+    public void onLocationChanged(@NonNull Location location) {
+        longitude = location.getLongitude();
+        latitude = location.getLatitude();
+    }
+
+    @Override
+    public void onLocationChanged(@NonNull List<Location> locations) {
+        LocationListener.super.onLocationChanged(locations);
+    }
+
+    @Override
+    public void onFlushComplete(int requestCode) {
+        LocationListener.super.onFlushComplete(requestCode);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        LocationListener.super.onStatusChanged(provider, status, extras);
+    }
+
+    @Override
+    public void onProviderEnabled(@NonNull String provider) {
+        LocationListener.super.onProviderEnabled(provider);
+    }
+
+    @Override
+    public void onProviderDisabled(@NonNull String provider) {
+        LocationListener.super.onProviderDisabled(provider);
     }
 }

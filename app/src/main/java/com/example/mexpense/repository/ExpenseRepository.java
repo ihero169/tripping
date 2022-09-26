@@ -13,7 +13,6 @@ import com.example.mexpense.entity.Expense;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ExpenseRepository extends SQLiteOpenHelper {
 
@@ -22,9 +21,12 @@ public class ExpenseRepository extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "expense_id";
     public static final String COLUMN_CATEGORY = "category"; // Required
     public static final String COLUMN_COST = "cost"; // Required
+    public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_DATE = "date"; // Required
     public static final String COLUMN_COMMENT = "comment"; // Optional
     public static final String COLUMN_TRIP_ID = "trip_id";
+    public static final String COLUMN_LATITUDE = "latitude";
+    public static final String COLUMN_LONGITUDE = "longitude";
 
     private SQLiteDatabase database;
 
@@ -33,11 +35,14 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                     " %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     " %s TEXT, " +
                     " %s REAL, " +
+                    " %s INTEGER, " +
                     " %s TEXT, " +
                     " %s TEXT, " +
                     " %s INTEGER," +
+                    " %s REAL," +
+                    " %s REAL," +
                     " FOREIGN KEY(trip_id) REFERENCES trips_table(trip_id) ON DELETE CASCADE )",
-            TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST,  COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID
+            TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST, COLUMN_AMOUNT, COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID, COLUMN_LATITUDE, COLUMN_LONGITUDE
     );
 
     public ExpenseRepository(@Nullable Context context) {
@@ -64,19 +69,21 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
         while (c.moveToNext())
         {
-            if(Integer.parseInt(c.getString(5)) == trip){
+            if(Integer.parseInt(c.getString(6)) == trip){
                 String category = c.getString(1);
                 double cost = Double.parseDouble(c.getString(2));
-                String date = c.getString(3);
-                String comment = c.getString(4);
-                int trip_id = Integer.parseInt(c.getString(5));
-                Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, date, comment, trip_id);
+                int amount = Integer.parseInt(c.getString(3));
+                String date = c.getString(4);
+                String comment = c.getString(5);
+                int trip_id = Integer.parseInt(c.getString(6));
+                double latitude = Double.parseDouble(c.getString(7));
+                double longitude = Double.parseDouble(c.getString(8));
+                Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude);
                 Log.w("Database", expense.toString());
                 expenses.add(expense);
             }
         }
         c.close();
-        db.close();
         return expenses;
     }
 
@@ -88,13 +95,15 @@ public class ExpenseRepository extends SQLiteOpenHelper {
             e.setId(Integer.parseInt(c.getString(0)));
             e.setCategory(c.getString(1));
             e.setCost(Double.parseDouble(c.getString(2)));
-            e.setDate(c.getString(3));
-            e.setComment(c.getString(4));
-            e.setTripId(Integer.parseInt(c.getString(5)));
+            e.setAmount(Integer.parseInt(c.getString(3)));
+            e.setDate(c.getString(4));
+            e.setComment(c.getString(5));
+            e.setTripId(Integer.parseInt(c.getString(6)));
+            e.setLatitude(Double.parseDouble(c.getString(7)));
+            e.setLongitude(Double.parseDouble(c.getString(8)));
             Log.i("DB", e.toString());
         }
         c.close();
-        db.close();
         return e;
     }
 
@@ -103,17 +112,18 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_CATEGORY, expense.getCategory());
         cv.put(COLUMN_COST, expense.getCost());
+        cv.put(COLUMN_AMOUNT, expense.getAmount());
         cv.put(COLUMN_DATE, expense.getDate());
         cv.put(COLUMN_COMMENT, expense.getComment());
         cv.put(COLUMN_TRIP_ID, expense.getTripId());
+        cv.put(COLUMN_LATITUDE, expense.getLatitude());
+        cv.put(COLUMN_LONGITUDE, expense.getLongitude());
         db.insert(TABLE_NAME, COLUMN_COMMENT, cv);
-        db.close();
     }
 
     public void deleteExpenses(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
-        db.close();
     }
 
     public void updateExpense(int id, Expense expense) {
@@ -122,10 +132,10 @@ public class ExpenseRepository extends SQLiteOpenHelper {
 
         cv.put(COLUMN_CATEGORY, expense.getCategory());
         cv.put(COLUMN_COST, expense.getCost());
+        cv.put(COLUMN_AMOUNT, expense.getAmount());
         cv.put(COLUMN_DATE, expense.getDate());
         cv.put(COLUMN_COMMENT, expense.getComment());
 
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
-        db.close();
     }
 }

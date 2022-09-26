@@ -1,5 +1,7 @@
 package com.example.mexpense.entity;
 
+import androidx.annotation.NonNull;
+
 import com.example.mexpense.ultilities.Constants;
 
 
@@ -8,18 +10,22 @@ public class Expense {
     private String category;
     private String date;
     private double cost;
+    private int amount;
     private String comment;
     private int tripId;
     private double latitude;
     private double longitude;
 
-    public Expense(int id, String category, double cost, String date, String comment, int tripId, double latitude, double longitude) {
+    public Expense(int id, String category, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude) {
         this.id = id;
         this.category = category;
         this.date = date;
         this.cost = cost;
+        this.amount = amount;
         this.comment = comment;
         this.tripId = tripId;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public Expense() {
@@ -27,11 +33,13 @@ public class Expense {
         category = "";
         date = "";
         cost = 0;
+        amount = 0;
         comment = "";
         latitude = 0.0;
         longitude = 0.0;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Expense{" +
@@ -39,6 +47,7 @@ public class Expense {
                 ", category='" + category + '\'' +
                 ", date='" + date + '\'' +
                 ", cost=" + cost +
+                ", amount=" + amount +
                 ", comment='" + comment + '\'' +
                 ", tripId=" + tripId +
                 ", latitude=" + latitude +
@@ -109,5 +118,13 @@ public class Expense {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 }

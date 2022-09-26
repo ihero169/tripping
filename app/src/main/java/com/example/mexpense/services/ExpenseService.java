@@ -27,7 +27,9 @@ public class ExpenseService {
     }
 
     public void updateExpense(int id, Expense expense) {
-        expense.setDate(Utilities.convertDate(expense.getDate(), true));
+        try{
+            expense.setDate(Utilities.convertDate(expense.getDate(), true));
+        } catch (Exception ignored){}
         repository.updateExpense(id, expense);
     }
 

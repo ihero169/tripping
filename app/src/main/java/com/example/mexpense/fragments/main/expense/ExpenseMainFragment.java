@@ -147,7 +147,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         double total = 0.0;
         List<Expense> expenses = mViewModel.expenseList.getValue();
         for (int i = 0; i < (expenses != null ? expenses.size() : 0); i++) {
-            total += expenses.get(i).getCost();
+            total += (expenses.get(i).getCost() * expenses.get(i).getAmount());
             binding.textTotal.setText(Double.toString(total));
         }
         return total;
