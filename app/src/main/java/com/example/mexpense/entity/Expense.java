@@ -10,8 +10,10 @@ public class Expense {
     private double cost;
     private String comment;
     private int tripId;
+    private double latitude;
+    private double longitude;
 
-    public Expense(int id, String category, double cost, String date, String comment, int tripId) {
+    public Expense(int id, String category, double cost, String date, String comment, int tripId, double latitude, double longitude) {
         this.id = id;
         this.category = category;
         this.date = date;
@@ -26,6 +28,8 @@ public class Expense {
         date = "";
         cost = 0;
         comment = "";
+        latitude = 0.0;
+        longitude = 0.0;
     }
 
     @Override
@@ -35,7 +39,10 @@ public class Expense {
                 ", category='" + category + '\'' +
                 ", date='" + date + '\'' +
                 ", cost=" + cost +
-                ", comment=" + cost +
+                ", comment='" + comment + '\'' +
+                ", tripId=" + tripId +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
                 '}';
     }
 
@@ -86,5 +93,21 @@ public class Expense {
 
     public void setTripId(int tripId) {
         this.tripId = tripId;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

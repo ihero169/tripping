@@ -264,9 +264,11 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private void toggleSearchField(){
         if(isOpen){
             binding.mainLayout.animate().translationY(-binding.sortLayout.getHeight()).setDuration(500);
+            binding.tripRecyclerView.animate().translationY(0).setDuration(600);
             binding.btnSearchToggle.setImageResource(R.drawable.ic_filter);
         } else {
             binding.mainLayout.animate().translationY(0).setDuration(500);
+            binding.tripRecyclerView.animate().translationY(430).setDuration(400);
             binding.btnSearchToggle.setImageResource(R.drawable.ic_cancel);
         }
         isOpen = !isOpen;

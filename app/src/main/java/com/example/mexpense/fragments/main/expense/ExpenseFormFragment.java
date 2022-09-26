@@ -1,8 +1,11 @@
 
 package com.example.mexpense.fragments.main.expense;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -29,6 +33,8 @@ import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.ultilities.Constants;
 import com.example.mexpense.ultilities.Utilities;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -58,6 +64,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private TextInputEditText editCost;
     private TextInputEditText editDate;
 
+    private FusedLocationProviderClient locationClient;
+
+    private double latitude;
+    private double longitude;
+
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
     }
@@ -69,6 +80,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         mViewModel = new ViewModelProvider(this).get(ExpenseFormViewModel.class);
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
         service = new ExpenseService(getContext());
+
+        locationClient = LocationServices.getFusedLocationProviderClient(getContext());
+        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(
+                    new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
+                    Constants.REQUEST_PERMISSION_FINE_LOCATION
+            );
+        }
 
         try {
             expenseId = getArguments().getInt("expenseId");
@@ -203,6 +222,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         bundle.putInt("tripId", tripId);
                         Log.e("Trip ID:", "handleSave: " + tripId);
 
+                        getLocation();
+
                         Utilities.hideInput(getActivity(), getView());
                         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
@@ -280,5 +301,12 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         myCalendar.set(Calendar.MONTH, month);
         myCalendar.set(Calendar.DAY_OF_MONTH, day);
     }
-
+    @SuppressLint("MissingPermission")
+    private void getLocation(){
+        locationClient.getLastLocation().addOnSuccessListener(getActivity(),
+                location -> {
+                    latitude = location.getLatitude();
+                    longitude = location.getLongitude();
+                });
+    }
 }
