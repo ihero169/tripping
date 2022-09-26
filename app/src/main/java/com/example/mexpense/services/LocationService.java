@@ -8,31 +8,28 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LocationService implements LocationListener {
 
     private final Context context;
-
     private double latitude;
-
     private double longitude;
     LocationManager lm;
 
     public LocationService(Context context) {
         this.context = context;
         lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        latitude = 0.0;
+        longitude = 0.0;
     }
 
-    public Map<String, Double> getLocation() {
-        Map<String, Double> locationValue = new HashMap<>();
-
+    public void getLocation() {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions((Activity) context, new String[]{
@@ -43,24 +40,34 @@ public class LocationService implements LocationListener {
 
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
         if (location != null) {
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-        } else {
-            latitude = 0.0;
-            longitude = 0.0;
+            setLatitude(latitude);
+            setLongitude(longitude);
+            Log.i("LOCATION SERVICE", "getLocation: " + getLatitude() + " / " + getLongitude());
         }
-
-        locationValue.put("longitude", longitude);
-        locationValue.put("latitude", latitude);
-
-        return locationValue;
     }
 
     public void removeService() {
         if (lm != null) {
             lm.removeUpdates(LocationService.this);
         }
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
@@ -81,16 +88,13 @@ public class LocationService implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
-        LocationListener.super.onStatusChanged(provider, status, extras);
     }
 
     @Override
     public void onProviderEnabled(@NonNull String provider) {
-        LocationListener.super.onProviderEnabled(provider);
     }
 
     @Override
     public void onProviderDisabled(@NonNull String provider) {
-        LocationListener.super.onProviderDisabled(provider);
     }
 }

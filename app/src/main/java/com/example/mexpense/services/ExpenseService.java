@@ -42,7 +42,6 @@ public class ExpenseService {
     }
 
     public void addExpense(Expense expense) {
-        expense.setDate(Utilities.convertDate(expense.getDate(), true));
         repository.addExpense(expense);
     }
 

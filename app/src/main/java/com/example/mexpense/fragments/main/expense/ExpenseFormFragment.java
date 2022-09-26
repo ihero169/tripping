@@ -1,15 +1,10 @@
 
 package com.example.mexpense.fragments.main.expense;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -35,10 +29,9 @@ import com.example.mexpense.R;
 import com.example.mexpense.databinding.FragmentExpenseFormBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
+import com.example.mexpense.services.LocationService;
 import com.example.mexpense.ultilities.Constants;
 import com.example.mexpense.ultilities.Utilities;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -46,10 +39,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.List;
 import java.util.Locale;
 
-public class ExpenseFormFragment extends Fragment implements View.OnClickListener, LocationListener {
+public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
 
     private ExpenseFormViewModel mViewModel;
     final Calendar myCalendar = Calendar.getInstance();
@@ -70,10 +62,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private TextInputEditText editDate;
     private TextInputEditText editAmount;
 
-    private FusedLocationProviderClient locationClient;
-
-    private double latitude;
-    private double longitude;
+    private LocationService locationService;
 
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
@@ -86,16 +75,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         mViewModel = new ViewModelProvider(this).get(ExpenseFormViewModel.class);
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
         service = new ExpenseService(getContext());
-
-        locationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        if(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            requestPermissions(
-                    new String[] { Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION },
-                    Constants.REQUEST_PERMISSION_FINE_LOCATION
-            );
-        } else {
-            getLocation();
-        }
+        locationService = new LocationService(getContext());
+        locationService.getLocation();
 
         try {
             expenseId = getArguments().getInt("expenseId");
@@ -159,6 +140,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         switch (item.getItemId()){
             case android.R.id.home:
                 Utilities.hideInput(getActivity(), getView());
+                // Close service
+                locationService.removeService();
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             case R.id.action_delete:
@@ -185,6 +168,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnSaveExpense:
+                locationService.getLocation();
                 handleSave();
                 break;
             case R.id.inputDate:
@@ -213,6 +197,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     Log.e("Action", "Delete expense: " + expenseId);
 
                     Utilities.hideInput(getActivity(), getView());
+                    // Close service;
+                    locationService.removeService();
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                 }).setNegativeButton("No", null).show();
@@ -223,20 +209,20 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation").setMessage("Are you sure?")
                     .setPositiveButton("Yes", (arg0, arg1) -> {
-                        getLocation();
                         if (expenseId == -1) {
                             service.addExpense(getFormInput());
                         } else {
                             service.updateExpense(expenseId, getFormInput());
                         }
-
                         Bundle bundle = new Bundle();
                         bundle.putInt("tripId", tripId);
                         Log.e("Trip ID:", "handleSave: " + tripId);
 
                         Utilities.hideInput(getActivity(), getView());
-                        Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
+                        // Close service;
+                        locationService.removeService();
+                        Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
                     }).setNegativeButton("No", null).show();
         }
     }
@@ -297,8 +283,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         String comment = binding.inputTextComment.getText().toString();
         double cost = Double.parseDouble(editCost.getText().toString());
         int amount = Integer.parseInt(editAmount.getText().toString());
-        getLocation();
-        return new Expense(-1, category, cost, amount, date, comment, tripId, latitude, longitude);
+        locationService.getLocation();
+        return new Expense(-1, category, cost, amount, date, comment, tripId, locationService.getLatitude(), locationService.getLongitude());
     }
 
     private void updateDate() {
@@ -322,56 +308,5 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         myCalendar.set(Calendar.YEAR, year);
         myCalendar.set(Calendar.MONTH, month);
         myCalendar.set(Calendar.DAY_OF_MONTH, day);
-    }
-
-    private final LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-        }
-    };
-
-    @SuppressLint("MissingPermission")
-    private void getLocation(){
-        LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
-
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if(location != null){
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
-        }
-    }
-
-
-    @Override
-    public void onLocationChanged(@NonNull Location location) {
-        longitude = location.getLongitude();
-        latitude = location.getLatitude();
-    }
-
-    @Override
-    public void onLocationChanged(@NonNull List<Location> locations) {
-        LocationListener.super.onLocationChanged(locations);
-    }
-
-    @Override
-    public void onFlushComplete(int requestCode) {
-        LocationListener.super.onFlushComplete(requestCode);
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        LocationListener.super.onStatusChanged(provider, status, extras);
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-        LocationListener.super.onProviderEnabled(provider);
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-        LocationListener.super.onProviderDisabled(provider);
     }
 }
