@@ -122,8 +122,9 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         ab.setHomeButtonEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        ab.setHomeAsUpIndicator(R.drawable.ic_back);
         setHasOptionsMenu(true);
+        ab.setTitle("Editing Trip");
 
         requireActivity().invalidateOptionsMenu();
 
@@ -141,7 +142,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         switch (item.getItemId()) {
             case android.R.id.home:
                 Utilities.hideInput(getActivity(), getView());
-                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                Navigation.findNavController(getView()).navigateUp();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

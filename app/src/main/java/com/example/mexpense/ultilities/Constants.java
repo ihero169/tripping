@@ -11,4 +11,8 @@ public class Constants {
 
     public static final String[] categories = {"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};
     public static final String[] trips = {"Meeting", "Conference", "Exhibit", "Event", "Team-building"};
+
+    public static final String VIEW = "View Layer";
+    public static final String SERVICE = "Service Layer";
+    public static final String REPOSITORY = "Repository Layer";
 }

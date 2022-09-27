@@ -198,6 +198,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        ab.setTitle("MExpense");
         setHasOptionsMenu(true);
 
         return binding.getRoot();
@@ -216,7 +217,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                Navigation.findNavController(getView()).navigateUp();
                 return true;
             case R.id.action_reset:
                 resetDatabase();

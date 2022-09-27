@@ -10,11 +10,6 @@
         android:label="fragment_expense_main"
         tools:layout="@layout/fragment_expense_main" />
     <fragment
-        android:id="@+id/loginFragment"
-        android:name="com.example.mexpense.fragments.login.LoginFragment"
-        android:label="fragment_login"
-        tools:layout="@layout/fragment_login" />
-    <fragment
         android:id="@+id/expenseFormFragment"
         android:name="com.example.mexpense.fragments.main.expense.ExpenseFormFragment"
         android:label="fragment_expense_form"
@@ -29,4 +24,9 @@
         android:name="com.example.mexpense.fragments.main.trip.TripFormFragment"
         android:label="fragment_trip_form"
         tools:layout="@layout/fragment_trip_form" />
+    <fragment
+        android:id="@+id/expenseDetailsFragment"
+        android:name="com.example.mexpense.fragments.main.expense.ExpenseDetailsFragment"
+        android:label="fragment_expense_details"
+        tools:layout="@layout/fragment_expense_details" />
 </navigation>

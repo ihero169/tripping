@@ -29,4 +29,5 @@ public class Utilities {
             manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
 }

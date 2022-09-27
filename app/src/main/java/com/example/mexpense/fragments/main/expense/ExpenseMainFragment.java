@@ -27,6 +27,7 @@ import com.example.mexpense.databinding.FragmentExpenseMainBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.services.TripService;
+import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -90,7 +91,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         ab.setHomeButtonEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        ab.setHomeAsUpIndicator(R.drawable.ic_back);
+        ab.setTitle("Trips");
         setHasOptionsMenu(true);
 
         return binding.getRoot();
@@ -109,7 +111,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                Navigation.findNavController(getView()).navigateUp();
                 return true;
             case R.id.action_delete:
                 handleDelete();
@@ -134,8 +136,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     @Override
     public void onItemClick(int expenseId) {
         Bundle bundle = getBundle(expenseId);
-        Log.d("Android", "Id: " + expenseId);
-        Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
+        Navigation.findNavController(getView()).navigate(R.id.expenseDetailsFragment, bundle);
     }
 
     public void addExpense() {
@@ -168,14 +169,12 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                 .setPositiveButton("Yes", (arg0, arg1) -> {
                     tripService.deleteTrip(tripId);
                     Bundle bundle = new Bundle();
-                    Log.e("Action", "Delete trip: " + tripId);
                     Navigation.findNavController(getView()).navigate(R.id.tripMainFragment, bundle);
                 }).setNegativeButton("No", null).show();
     }
 
     private void handleEdit(){
         Bundle bundle = getBundle(tripId);
-        Log.d("Android", "Id: " + tripId);
         Navigation.findNavController(getView()).navigate(R.id.tripFormFragment, bundle);
     }
 }

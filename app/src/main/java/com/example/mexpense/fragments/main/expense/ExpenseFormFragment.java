@@ -95,7 +95,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         editAmount = binding.inputAmount;
 
         Button saveButton = binding.btnSaveExpense;
-
         saveButton.setOnClickListener(this);
         editDate.setOnClickListener(this);
 
@@ -121,7 +120,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         ab.setHomeButtonEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setHomeAsUpIndicator(R.drawable.ic_home);
+        ab.setHomeAsUpIndicator(R.drawable.ic_back);
+        ab.setTitle("Editing Expense");
         setHasOptionsMenu(true);
 
         requireActivity().invalidateOptionsMenu();
@@ -142,7 +142,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                 Utilities.hideInput(getActivity(), getView());
                 // Close service
                 locationService.removeService();
-                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                Navigation.findNavController(getView()).navigateUp();
                 return true;
             case R.id.action_delete:
                 handleDelete();
@@ -194,7 +194,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     service.deleteExpense(expenseId);
                     Bundle bundle = new Bundle();
                     bundle.putInt("tripId", tripId);
-                    Log.e("Action", "Delete expense: " + expenseId);
 
                     Utilities.hideInput(getActivity(), getView());
                     // Close service;
@@ -214,15 +213,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         } else {
                             service.updateExpense(expenseId, getFormInput());
                         }
-                        Bundle bundle = new Bundle();
-                        bundle.putInt("tripId", tripId);
-                        Log.e("Trip ID:", "handleSave: " + tripId);
-
-                        Utilities.hideInput(getActivity(), getView());
-
                         // Close service;
                         locationService.removeService();
-                        Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
+                        Navigation.findNavController(getView()).navigateUp();
                     }).setNegativeButton("No", null).show();
         }
     }
