@@ -35,14 +35,10 @@ public class TripService {
     }
 
     public void addTrip(Trip trip) {
-        trip.setStartDate(Utilities.convertDate(trip.getStartDate(), true));
-        trip.setEndDate(Utilities.convertDate(trip.getEndDate(), true));
         repository.addTrip(trip);
     }
 
     public void updateTrip(int id, Trip trip) {
-        trip.setStartDate(Utilities.convertDate(trip.getStartDate(), true));
-        trip.setEndDate(Utilities.convertDate(trip.getEndDate(), true));
         repository.updateTrip(id, trip);
     }
 

@@ -170,13 +170,17 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+        if(mapView!=null) {
+            mapView.onPause();
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mapView.onDestroy();
+        if(mapView!=null){
+            mapView.onDestroy();
+        }
     }
 
     @Override

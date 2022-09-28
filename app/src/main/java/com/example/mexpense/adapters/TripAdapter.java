@@ -17,6 +17,7 @@ import java.util.List;
 public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder> {
 
     public class TripViewHolder extends RecyclerView.ViewHolder {
+
         private final TripListItemBinding binding;
 
         public TripViewHolder(@NonNull View itemView) {

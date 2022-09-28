@@ -64,6 +64,12 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private LocationService locationService;
 
+    private static final String CATEGORY_KEY = "category";
+    private static final String COST_KEY = "cost";
+    private static final String AMOUNT_KEY = "amount";
+    private static final String DATE_KEY = "date";
+    private static final String COMMENT_KEY = "comment";
+
     public static ExpenseFormFragment newInstance() {
         return new ExpenseFormFragment();
     }
@@ -106,11 +112,21 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         mViewModel.expense.observe(
                 getViewLifecycleOwner(),
                 expense -> {
-                    binding.inputTextCategories.setText(expense.getCategory());
-                    getCategories();
-                    binding.inputDate.setText(expense.getDate());
-                    binding.inputCost.setText(String.valueOf(expense.getCost()));
-                    binding.inputAmount.setText(String.valueOf(expense.getAmount()));
+                    if(savedInstanceState != null){
+                        binding.inputTextCategories.setText(savedInstanceState.getString(CATEGORY_KEY));
+                        getCategories();
+                        binding.inputDate.setText(expense.getDate());
+                        binding.inputCost.setText(String.valueOf(savedInstanceState.getDouble(COST_KEY)));
+                        binding.inputAmount.setText(String.valueOf(savedInstanceState.getInt(AMOUNT_KEY)));
+                        binding.inputTextComment.setText(savedInstanceState.getString(COMMENT_KEY));
+                    } else {
+                        binding.inputTextCategories.setText(expense.getCategory());
+                        getCategories();
+                        binding.inputDate.setText(expense.getDate());
+                        binding.inputCost.setText(String.valueOf(expense.getCost()));
+                        binding.inputAmount.setText(String.valueOf(expense.getAmount()));
+                        binding.inputTextComment.setText(expense.getComment());
+                    }
                 }
         );
         service.getExpenseById(mViewModel.expense, expenseId);
@@ -142,6 +158,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                 Utilities.hideInput(getActivity(), getView());
                 // Close service
                 locationService.removeService();
+                Utilities.hideInput(getActivity(), getView());
                 Navigation.findNavController(getView()).navigateUp();
                 return true;
             case R.id.action_delete:
@@ -163,6 +180,15 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         }
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        savedInstanceState.putString(CATEGORY_KEY, editCategory.getText().toString());
+        savedInstanceState.putDouble(COST_KEY, Double.parseDouble(editCost.getText().toString()));
+        savedInstanceState.putInt(AMOUNT_KEY, Integer.parseInt(editAmount.getText().toString()));
+        savedInstanceState.putString(DATE_KEY, editDate.getText().toString());
+        savedInstanceState.putString(COMMENT_KEY, binding.inputTextComment.getText().toString());
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
     @Override
     public void onClick(View view) {
@@ -198,6 +224,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     Utilities.hideInput(getActivity(), getView());
                     // Close service;
                     locationService.removeService();
+                    Utilities.hideInput(getActivity(), getView());
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
                 }).setNegativeButton("No", null).show();
@@ -215,6 +242,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         }
                         // Close service;
                         locationService.removeService();
+                        Utilities.hideInput(getActivity(), getView());
                         Navigation.findNavController(getView()).navigateUp();
                     }).setNegativeButton("No", null).show();
         }

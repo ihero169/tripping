@@ -55,8 +55,15 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     private Switch assessment;
 
     private TripService service;
-
     int tripId;
+
+    private static final String NAME_KEY = "category";
+    private static final String DESTINATION_KEY = "destination";
+    private static final String START_DATE_KEY = "start";
+    private static final String END_DATE_KEY = "end";
+    private static final String PARTICIPANT_KEY = "participant";
+    private static final String DESCRIPTION_KEY = "notes";
+    private static final String ASSESSMENT_KEY = "assessment";
 
     public static TripFormFragment newInstance() {
         return new TripFormFragment();
@@ -105,14 +112,27 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
                 trip -> {
-                    binding.inputTextTripType.setText(trip.getName());
-                    getTrips();
-                    binding.inputStartDate.setText(trip.getStartDate());
-                    binding.inputEndDate.setText(trip.getEndDate());
-                    binding.inputTextDestination.setText(trip.getDestination());
-                    binding.inputTextDescription.setText(trip.getDestination());
-                    binding.inputTextParticipant.setText(String.valueOf(trip.getParticipants()));
-                    binding.switchRequiredAssessment.setChecked(trip.getRequiredAssessment());
+                    if(savedInstanceState != null){
+                        binding.inputTextTripType.setText(savedInstanceState.getString(NAME_KEY));
+                        getTrips();
+                        binding.inputStartDate.setText(savedInstanceState.getString(START_DATE_KEY));
+                        binding.inputEndDate.setText(savedInstanceState.getString(END_DATE_KEY));
+                        binding.inputTextDestination.setText(savedInstanceState.getString(DESTINATION_KEY));
+                        binding.inputTextDescription.setText(savedInstanceState.getString(DESCRIPTION_KEY));
+                        binding.inputTextParticipant.setText(savedInstanceState.getString(PARTICIPANT_KEY));
+                        binding.switchRequiredAssessment.setChecked(savedInstanceState.getBoolean(ASSESSMENT_KEY));
+                    }
+                    else{
+                        binding.inputTextTripType.setText(trip.getName());
+                        getTrips();
+                        binding.inputStartDate.setText(trip.getStartDate());
+                        binding.inputEndDate.setText(trip.getEndDate());
+                        binding.inputTextDestination.setText(trip.getDestination());
+                        binding.inputTextDescription.setText(trip.getDestination());
+                        binding.inputTextParticipant.setText(String.valueOf(trip.getParticipants()));
+                        binding.switchRequiredAssessment.setChecked(trip.getRequiredAssessment());
+                    }
+
                 }
         );
         service.getTrip(mViewModel.trip, tripId);
@@ -159,6 +179,18 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
             menu.findItem(R.id.action_delete).setVisible(false);
             menu.findItem(R.id.action_edit).setVisible(true);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState){
+        savedInstanceState.putString(NAME_KEY, editTripType.getText().toString());
+        savedInstanceState.putString(DESTINATION_KEY, editDestination.getText().toString());
+        savedInstanceState.putString(START_DATE_KEY, editStartDate.getText().toString());
+        savedInstanceState.putString(END_DATE_KEY, editEndDate.getText().toString());
+        savedInstanceState.putString(PARTICIPANT_KEY, editParticipant.getText().toString());
+        savedInstanceState.putString(DESCRIPTION_KEY, editDescription.getText().toString());
+        savedInstanceState.putBoolean(ASSESSMENT_KEY, binding.switchRequiredAssessment.isChecked());
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -246,7 +278,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     }
 
     private boolean dateValidation(String startStr, String endStr) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
         LocalDate startDate = LocalDate.parse(startStr, formatter);
         LocalDate endDate = LocalDate.parse(endStr, formatter);
         return endDate.isAfter(startDate) || endDate.isEqual(startDate);
@@ -264,7 +296,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updateDate(TextView dateView) {
-        String format = Constants.DATE_FORMAT;
+        String format = Constants.DATE_FORMAT_DATABASE;
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         dateView.setText(dateFormat.format(myCalendar.getTime()));
     }
