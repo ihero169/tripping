@@ -15,4 +15,7 @@ public class Constants {
     public static final String VIEW = "View Layer";
     public static final String SERVICE = "Service Layer";
     public static final String REPOSITORY = "Repository Layer";
+
+    public static final String LIMIT_START_DATE = "1910-01-01";
+    public static final String LIMIT_END_DATE = "2099-01-01";
 }

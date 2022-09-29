@@ -137,23 +137,27 @@ public class TripRepository extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM expenses_table");
     }
 
-    public List<Trip> searchByDestination(String d) {
+    public List<Trip> masterSearch(String name, String destination, String start, String end){
         SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_DESTINATION + " LIKE '%" + d + "%'";
-        Cursor c = db.rawQuery(query, null);
-        return getList(c);
-    }
+        String query = "SELECT * FROM " + TABLE_NAME + " WHERE ";
+        boolean isFirst = true;
+        if(!name.equals("")) {
+            query += COLUMN_NAME + " LIKE '%" + name + "%'";
+            isFirst = false;
+        }
 
-    public List<Trip> searchByType(String type){
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_NAME + "='" + type + "'";
-        Cursor c = db.rawQuery(query, null);
-        return getList(c);
-    }
+        if(!destination.equals("")){
+            if(!isFirst){
+                query += " AND ";
+            }
+            query += COLUMN_DESTINATION + " LIKE '%" + destination + "%'";
+        }
 
-    public List<Trip> narrowByDate(String start, String end) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        String query = "SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_START_DATE + " >= '" + start + "' AND " + COLUMN_END_DATE + " <= '" + end + "'";
+        if(!isFirst){
+            query += " AND ";
+        }
+        query += COLUMN_START_DATE + " >= '" + start + "' AND " + COLUMN_END_DATE + " <= '" + end + "'";
+
         Cursor c = db.rawQuery(query, null);
         return getList(c);
     }

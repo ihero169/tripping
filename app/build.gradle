@@ -30,6 +30,12 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    packagingOptions {
+        exclude '/lib/armeabi-v7a/libNanumGothicFontPkg.so'
+        exclude '/lib/armeabi-v7a/libLohitIndicFontPkg.so'
+        exclude '/lib/armeabi-v7a/libChineseFontPkg.so'
+    }
 }
 
 dependencies {

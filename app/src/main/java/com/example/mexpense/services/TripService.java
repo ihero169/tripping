@@ -1,12 +1,12 @@
 package com.example.mexpense.services;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.repository.TripRepository;
+import com.example.mexpense.ultilities.Constants;
 import com.example.mexpense.ultilities.Utilities;
 
 import java.util.List;
@@ -54,30 +54,19 @@ public class TripService {
         repository.deleteAll();
     }
 
-    public void searchByDestination(MutableLiveData<List<Trip>> trip, String destination) {
-        trip.setValue(repository.searchByDestination(destination));
-    }
-
-    public void searchByDate(MutableLiveData<List<Trip>> trips, String start, String end) {
+    public void masterSearch(MutableLiveData<List<Trip>> trips, String name, String destination, String start, String end){
         if (start.equals("")) {
-            start = "1940-01-01";
+            start = Constants.LIMIT_START_DATE;
         } else {
             start = Utilities.convertDate(start, true);
         }
 
         if (end.equals("")) {
-            end = "2099-01-01";
+            end = Constants.LIMIT_END_DATE;
         } else {
             end = Utilities.convertDate(end, true);
         }
 
-        trips.setValue(
-                repository.narrowByDate(start, end)
-        );
-    }
-
-    public void searchByType(MutableLiveData<List<Trip>> tripList, String type) {
-        Log.i("Service", "Search: " + type);
-        tripList.setValue(repository.searchByType(type));
+        trips.setValue(repository.masterSearch(name, destination, start, end));
     }
 }

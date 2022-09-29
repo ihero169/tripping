@@ -1,23 +1,8 @@
 package com.example.mexpense.fragments.main.trip;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.ViewModelProvider;
-
-import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -27,13 +12,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.TranslateAnimation;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.TripAdapter;
@@ -121,7 +114,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                service.searchByDate(mViewModel.tripList, editStartDate.getText().toString(), editEndDate.getText().toString());
+                service.masterSearch(
+                        mViewModel.tripList,
+                        sortTripType.getText().toString(),
+                        editDestination.getText().toString(),
+                        editStartDate.getText().toString(),
+                        editEndDate.getText().toString());
             }
         });
 
@@ -143,7 +141,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
             @Override
             public void afterTextChanged(Editable editable) {
-                service.searchByDate(mViewModel.tripList, editStartDate.getText().toString(), editEndDate.getText().toString());
+                service.masterSearch(
+                        mViewModel.tripList,
+                        sortTripType.getText().toString(),
+                        editDestination.getText().toString(),
+                        editStartDate.getText().toString(),
+                        editEndDate.getText().toString());
             }
         });
 
@@ -169,9 +172,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             public void afterTextChanged(Editable editable) {
                 String type = sortTripType.getText().toString();
                 Log.i("Search", "Keyword: " + type);
-                if(type != ""){
-                    service.searchByType(mViewModel.tripList, type);
-                }
+                service.masterSearch(
+                        mViewModel.tripList,
+                        sortTripType.getText().toString(),
+                        editDestination.getText().toString(),
+                        editStartDate.getText().toString(),
+                        editEndDate.getText().toString());
             }
         });
 
@@ -186,9 +192,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             @Override
             public void afterTextChanged(Editable editable) {
                 String destination = editDestination.getText().toString();
-                if(destination != ""){
-                    service.searchByDestination(mViewModel.tripList, destination);
-                }
+                service.masterSearch(
+                        mViewModel.tripList,
+                        sortTripType.getText().toString(),
+                        editDestination.getText().toString(),
+                        editStartDate.getText().toString(),
+                        editEndDate.getText().toString());
             }
         });
 
