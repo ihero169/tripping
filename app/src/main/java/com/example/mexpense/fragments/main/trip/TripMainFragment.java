@@ -28,6 +28,10 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.TripAdapter;
 import com.example.mexpense.databinding.FragmentTripMainBinding;
@@ -38,11 +42,21 @@ import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.ProtocolException;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TripMainFragment extends Fragment implements View.OnClickListener, TripAdapter.TripItemListener {
 
@@ -68,6 +82,8 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
     private boolean isOpen = false;
 
+    private HttpURLConnection con;
+
     public static TripMainFragment newInstance() {
         return new TripMainFragment();
     }
@@ -92,6 +108,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                     binding.tripRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 }
         );
+
         service.getTrips(mViewModel.tripList);
 
         sortBtn = binding.btnSortId;
@@ -107,10 +124,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editStartDate.setOnClickListener(this);
         editStartDate.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
@@ -134,10 +153,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editEndDate.setOnClickListener(this);
         editEndDate.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
@@ -162,7 +183,8 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         getTrips();
         sortTripType.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -184,14 +206,15 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         editDestination = binding.editDestination;
         editDestination.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                String destination = editDestination.getText().toString();
                 service.masterSearch(
                         mViewModel.tripList,
                         sortTripType.getText().toString(),
@@ -201,7 +224,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             }
         });
 
-        AppCompatActivity app = (AppCompatActivity)getActivity();
+        AppCompatActivity app = (AppCompatActivity) getActivity();
         ActionBar ab = app.getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
@@ -214,24 +237,29 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_trip_fragment, menu);
         menu.findItem(R.id.action_delete).setVisible(false);
         menu.findItem(R.id.action_edit).setVisible(false);
         menu.findItem(R.id.action_reset).setVisible(true);
+        menu.findItem(R.id.action_upload).setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 Navigation.findNavController(getView()).navigateUp();
                 return true;
             case R.id.action_reset:
                 resetDatabase();
                 return true;
-            default: return super.onOptionsItemSelected(item);
+            case R.id.action_upload:
+                uploadToCloud();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -271,8 +299,8 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
     }
 
-    private void toggleSearchField(){
-        if(isOpen){
+    private void toggleSearchField() {
+        if (isOpen) {
             binding.mainLayout.animate().translationY(-binding.sortLayout.getHeight()).setDuration(500);
             binding.tripRecyclerView.animate().translationY(0).setDuration(600);
             binding.btnSearchToggle.setImageResource(R.drawable.ic_filter);
@@ -284,7 +312,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         isOpen = !isOpen;
     }
 
-    private void addTrip(){
+    private void addTrip() {
         Bundle bundle = new Bundle();
         bundle.putInt("tripId", -1);
         Navigation.findNavController(getView()).navigate(R.id.tripFormFragment, bundle);
@@ -313,7 +341,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         sortTripType.setOnClickListener(this);
     }
 
-    private void resetNarrowDown(){
+    private void resetNarrowDown() {
         sortTripType.setText("");
         editStartDate.setText("");
         editEndDate.setText("");
@@ -321,5 +349,31 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         binding.layoutStartDateSort.setError(null);
         Utilities.hideInput(getActivity(), getView());
         service.getTrips(mViewModel.tripList);
+    }
+
+    private void uploadToCloud() {
+        String url = getString(R.string.service_url);
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, response -> Log.d("POST REQUEST", response.toString()), error -> Log.d("POST REQUEST", error.getMessage())) {
+            @Override
+            protected Map getParams() {
+                Map params = new HashMap();
+
+                params.put("userId", "wm123");
+                params.put("detailList", "[{\"name\":\"Android Conference\", \"description\" : \"wm123-test 123\"}]");
+
+                return params;
+            }
+
+            @Override
+            public Map getHeaders() {
+                HashMap headers = new HashMap();
+                headers.put("Content-Type", "application/x-www-form-urlencoded");
+                return headers;
+            }
+        };
+
+        Log.i("REQUEST", "postData: " + jsonObjReq);
+        queue.add(jsonObjReq);
     }
 }

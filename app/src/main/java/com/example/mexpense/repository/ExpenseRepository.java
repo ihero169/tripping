@@ -27,6 +27,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
     public static final String COLUMN_TRIP_ID = "trip_id";
     public static final String COLUMN_LATITUDE = "latitude";
     public static final String COLUMN_LONGITUDE = "longitude";
+    public static final String COLUMN_IMAGE = "image";
 
     private SQLiteDatabase database;
 
@@ -41,8 +42,9 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                     " %s INTEGER," +
                     " %s REAL," +
                     " %s REAL," +
+                    " %s BLOB," +
                     " FOREIGN KEY(trip_id) REFERENCES trips_table(trip_id) ON DELETE CASCADE )",
-            TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST, COLUMN_AMOUNT, COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID, COLUMN_LATITUDE, COLUMN_LONGITUDE
+            TABLE_NAME, COLUMN_ID, COLUMN_CATEGORY, COLUMN_COST, COLUMN_AMOUNT, COLUMN_DATE, COLUMN_COMMENT, COLUMN_TRIP_ID, COLUMN_LATITUDE, COLUMN_LONGITUDE, COLUMN_IMAGE
     );
 
     public ExpenseRepository(@Nullable Context context) {
@@ -67,9 +69,8 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         List<Expense> expenses = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        while (c.moveToNext())
-        {
-            if(Integer.parseInt(c.getString(6)) == trip){
+        while (c.moveToNext()) {
+            if (Integer.parseInt(c.getString(6)) == trip) {
                 String category = c.getString(1);
                 double cost = Double.parseDouble(c.getString(2));
                 int amount = Integer.parseInt(c.getString(3));
@@ -79,9 +80,28 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                 double latitude = Double.parseDouble(c.getString(7));
                 double longitude = Double.parseDouble(c.getString(8));
                 Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude);
-                Log.w("Database", expense.toString());
                 expenses.add(expense);
             }
+        }
+        c.close();
+        return expenses;
+    }
+
+    public List<Expense> getAllExpenses() {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        while (c.moveToNext()) {
+            String category = c.getString(1);
+            double cost = Double.parseDouble(c.getString(2));
+            int amount = Integer.parseInt(c.getString(3));
+            String date = c.getString(4);
+            String comment = c.getString(5);
+            int trip_id = Integer.parseInt(c.getString(6));
+            double latitude = Double.parseDouble(c.getString(7));
+            double longitude = Double.parseDouble(c.getString(8));
+            Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude);
+            expenses.add(expense);
         }
         c.close();
         return expenses;
@@ -101,7 +121,6 @@ public class ExpenseRepository extends SQLiteOpenHelper {
             e.setTripId(Integer.parseInt(c.getString(6)));
             e.setLatitude(Double.parseDouble(c.getString(7)));
             e.setLongitude(Double.parseDouble(c.getString(8)));
-            Log.i("DB", e.toString());
         }
         c.close();
         return e;

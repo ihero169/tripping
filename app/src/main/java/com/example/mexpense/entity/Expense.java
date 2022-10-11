@@ -3,6 +3,7 @@ package com.example.mexpense.entity;
 import androidx.annotation.NonNull;
 
 import com.example.mexpense.ultilities.Constants;
+import com.google.gson.Gson;
 
 
 public class Expense {
@@ -15,6 +16,7 @@ public class Expense {
     private int tripId;
     private double latitude;
     private double longitude;
+    private byte[] image;
 
     public Expense(int id, String category, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude) {
         this.id = id;
@@ -37,6 +39,18 @@ public class Expense {
         comment = "";
         latitude = 0.0;
         longitude = 0.0;
+        image = new byte[0];
+    }
+
+    public String toJson() {
+        Gson gson = new Gson();
+        String json = gson.toJson(this);
+        return json;
+    }
+
+    public Expense fromJson(String json) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, Expense.class);
     }
 
     @NonNull
@@ -126,5 +140,13 @@ public class Expense {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
     }
 }

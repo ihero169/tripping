@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MExpense</string>
+    <string name="service_url">https://cwservice1786.herokuapp.com/sendPayLoad</string>>
 </resources>

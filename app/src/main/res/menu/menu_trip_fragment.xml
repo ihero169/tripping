@@ -24,4 +24,11 @@
         app:showAsAction="ifRoom"
         />
 
+    <item
+        android:id="@+id/action_upload"
+        android:title="Upload"
+        android:icon="@drawable/ic_cloud_upload"
+        app:showAsAction="ifRoom"
+        />
+
 </menu>

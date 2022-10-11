@@ -174,6 +174,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         super.onPrepareOptionsMenu(menu);
         Trip t = mViewModel.trip.getValue();
         menu.findItem(R.id.action_reset).setVisible(false);
+        menu.findItem(R.id.action_upload).setVisible(false);
         if (t != null
                 && t.getId() == Constants.NEW_EXPENSE) {
             menu.findItem(R.id.action_delete).setVisible(false);

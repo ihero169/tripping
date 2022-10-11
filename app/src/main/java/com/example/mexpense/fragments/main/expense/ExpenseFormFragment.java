@@ -1,11 +1,18 @@
 
 package com.example.mexpense.fragments.main.expense;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,10 +24,15 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.camera.core.CameraX;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -35,6 +47,8 @@ import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -61,6 +75,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     private TextInputEditText editCost;
     private TextInputEditText editDate;
     private TextInputEditText editAmount;
+
+    private Button buttonAddImage;
 
     private LocationService locationService;
 
@@ -99,10 +115,12 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         editCost = binding.inputCost;
         editDate = binding.inputDate;
         editAmount = binding.inputAmount;
+        buttonAddImage = binding.btnImage;
 
         Button saveButton = binding.btnSaveExpense;
         saveButton.setOnClickListener(this);
         editDate.setOnClickListener(this);
+        buttonAddImage.setOnClickListener(this);
 
         date = (datePicker, year, month, day) -> {
             setCalendar(year, month, day);
@@ -174,6 +192,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         Expense e = mViewModel.expense.getValue();
         menu.findItem(R.id.action_reset).setVisible(false);
         menu.findItem(R.id.action_edit).setVisible(false);
+        menu.findItem(R.id.action_upload).setVisible(false);
         if (e != null
                 && e.getId() == Constants.NEW_EXPENSE){
             menu.findItem(R.id.action_delete).setVisible(false);
@@ -197,6 +216,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                 locationService.getLocation();
                 handleSave();
                 break;
+            case R.id.btnImage:
+                setImage();
+                break;
             case R.id.inputDate:
                 setDate();
                 break;
@@ -205,6 +227,33 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             default:
                 break;
         }
+    }
+
+    private void setImage(){
+        int MY_PERMISSIONS_REQUEST_CAMERA=0;
+        Log.i("CAMERA ACCESS", "setImage:  setting image");
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA))
+            {
+                openCamera();
+            }
+            else
+            {
+                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA );
+            }
+        }
+    }
+
+    private void openCamera(){
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        startActivityForResult(cameraIntent, 1001);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Bitmap photo = (Bitmap) data.getExtras().get("data");
     }
 
     private void getCategories(){

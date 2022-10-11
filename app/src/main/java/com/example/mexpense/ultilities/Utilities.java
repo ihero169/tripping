@@ -1,8 +1,11 @@
 package com.example.mexpense.ultilities;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
@@ -41,6 +44,17 @@ public class Utilities {
 
     public static Bitmap bytesToBitmap(byte[] bytes){
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+    }
+
+    public static Camera getCameraInstance(){
+        Camera c = null;
+        try {
+            c = Camera.open(); // attempt to get a Camera instance
+        }
+        catch (Exception e){
+            // Camera is not available (in use or does not exist)
+        }
+        return c; // returns null if camera is unavailable
     }
 
 }

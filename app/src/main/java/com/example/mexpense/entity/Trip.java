@@ -1,6 +1,7 @@
 package com.example.mexpense.entity;
 
 import com.example.mexpense.ultilities.Constants;
+import com.google.gson.Gson;
 
 public class Trip {
     private int id;
@@ -12,7 +13,6 @@ public class Trip {
     private int participants;
     private String description;
     private double total;
-    private byte[] image;
 
     public Trip() {
         this.id = Constants.NEW_TRIP;
@@ -23,10 +23,9 @@ public class Trip {
         this.requiredAssessment = false;
         this.participants = 0;
         this.description = "";
-        this.image = new byte[1];
     }
 
-    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants,  String description) {
+    public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants, String description) {
         this.id = id;
         this.name = name;
         this.destination = destination;
@@ -122,11 +121,6 @@ public class Trip {
         this.description = description;
     }
 
-    public byte[] getImage()
-    public void setImage(byte[] image){
-        this.image = image;
-    }
-
     @Override
     public String toString() {
         return "Trip{" +
@@ -140,5 +134,16 @@ public class Trip {
                 ", description='" + description + '\'' +
                 ", total=" + total +
                 '}';
+    }
+
+    public String toJson() {
+        Gson gson = new Gson();
+        String json = gson.toJson(this);
+        return json;
+    }
+
+    public Trip fromJson(String json) {
+        Gson gson = new Gson();
+        return gson.fromJson(json, Trip.class);
     }
 }

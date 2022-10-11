@@ -104,6 +104,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
         menu.findItem(R.id.action_delete).setVisible(true);
         menu.findItem(R.id.action_edit).setVisible(true);
         menu.findItem(R.id.action_reset).setVisible(false);
+        menu.findItem(R.id.action_upload).setVisible(false);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
