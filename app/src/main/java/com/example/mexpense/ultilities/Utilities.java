@@ -1,9 +1,12 @@
 package com.example.mexpense.ultilities;
 
 import android.app.Activity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -28,6 +31,16 @@ public class Utilities {
         if(manager.isAcceptingText()){
             manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
+    }
+
+    public static byte[] bitmapToBytes(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 0, stream);
+        return stream.toByteArray();
+    }
+
+    public static Bitmap bytesToBitmap(byte[] bytes){
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
 }

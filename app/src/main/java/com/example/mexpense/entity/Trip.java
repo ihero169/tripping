@@ -12,6 +12,7 @@ public class Trip {
     private int participants;
     private String description;
     private double total;
+    private byte[] image;
 
     public Trip() {
         this.id = Constants.NEW_TRIP;
@@ -22,6 +23,7 @@ public class Trip {
         this.requiredAssessment = false;
         this.participants = 0;
         this.description = "";
+        this.image = new byte[1];
     }
 
     public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants,  String description) {
@@ -118,6 +120,11 @@ public class Trip {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public byte[] getImage()
+    public void setImage(byte[] image){
+        this.image = image;
     }
 
     @Override

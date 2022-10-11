@@ -1,6 +1,7 @@
 package com.example.mexpense.services;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -29,6 +30,7 @@ public class LocationService implements LocationListener {
         longitude = 0.0;
     }
 
+    @SuppressLint("MissingPermission")
     public void getLocation() {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -37,7 +39,6 @@ public class LocationService implements LocationListener {
                     Manifest.permission.ACCESS_COARSE_LOCATION
             }, 101);
         }
-
         lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
         Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 

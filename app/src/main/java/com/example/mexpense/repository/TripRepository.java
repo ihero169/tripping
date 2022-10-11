@@ -26,6 +26,7 @@ public class TripRepository extends SQLiteOpenHelper {
     public static final String COLUMN_PARTICIPANT = "participants";
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_TOTAL = "total";
+    public static final String COLUMN_IMAGE = "image";
 
     private SQLiteDatabase database;
 
@@ -39,8 +40,9 @@ public class TripRepository extends SQLiteOpenHelper {
                     " %s TEXT, " +
                     " %s INTEGER, " +
                     " %s TEXT, " +
-                    " %s REAL)",
-            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_DESTINATION, COLUMN_START_DATE, COLUMN_END_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_PARTICIPANT, COLUMN_DESCRIPTION, COLUMN_TOTAL
+                    " %s REAL, " +
+                    " %s BLOB)",
+            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_DESTINATION, COLUMN_START_DATE, COLUMN_END_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_PARTICIPANT, COLUMN_DESCRIPTION, COLUMN_TOTAL, COLUMN_IMAGE
     );
 
     public TripRepository(Context context) {
