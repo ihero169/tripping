@@ -137,8 +137,7 @@ public class Trip {
     }
 
     public String toJson() {
-        Gson gson = new Gson();
-        String json = gson.toJson(this);
+        Gson gson = new Gson();String json = gson.toJson(this);
         return json;
     }
 

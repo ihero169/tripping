@@ -18,7 +18,7 @@ public class TripRepository extends SQLiteOpenHelper {
     public static final String TABLE_NAME = "trips_table";
 
     public static final String COLUMN_ID = "trip_id";
-    public static final String COLUMN_NAME = "trip_name"; // Required
+    public static final String COLUMN_NAME = "name"; // Required
     public static final String COLUMN_DESTINATION = "destination"; // Required
     public static final String COLUMN_START_DATE = "startDate"; // Required
     public static final String COLUMN_END_DATE = "endDate"; // Required
@@ -151,12 +151,15 @@ public class TripRepository extends SQLiteOpenHelper {
             if(!isFirst){
                 query += " AND ";
             }
+
             query += COLUMN_DESTINATION + " LIKE '%" + destination + "%'";
+            isFirst = false;
         }
 
         if(!isFirst){
             query += " AND ";
         }
+
         query += COLUMN_START_DATE + " >= '" + start + "' AND " + COLUMN_END_DATE + " <= '" + end + "'";
 
         Cursor c = db.rawQuery(query, null);
@@ -181,5 +184,10 @@ public class TripRepository extends SQLiteOpenHelper {
         return trips;
     }
 
+    public void getCloudData(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "";
+        db.rawQuery(query, null);
 
+    }
 }

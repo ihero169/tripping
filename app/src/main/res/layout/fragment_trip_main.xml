@@ -261,4 +261,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
 
+    <TextView
+        android:id="@+id/txtNotifyEmptyTrip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Please add some Expenses"
+        app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tripRecyclerView" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -30,7 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.Response;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.TripAdapter;
@@ -42,14 +43,10 @@ import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -106,6 +103,11 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                     adapter = new TripAdapter(trips, this);
                     binding.tripRecyclerView.setAdapter(adapter);
                     binding.tripRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    if (trips.size() == 0) {
+                        binding.txtNotifyEmptyTrip.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.txtNotifyEmptyTrip.setVisibility(View.INVISIBLE);
+                    }
                 }
         );
 
@@ -354,26 +356,54 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private void uploadToCloud() {
         String url = getString(R.string.service_url);
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST, url, null, response -> Log.d("POST REQUEST", response.toString()), error -> Log.d("POST REQUEST", error.getMessage())) {
+        StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, (Response.Listener<String>) response -> {
+            try {
+                JSONObject api_response = new JSONObject(response);
+                Log.i("RESPONSE", "uploadToCloud: " + api_response);
+                if(api_response.get("uploadResponseCode").equals("SUCCESS")){
+                    new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_check_circle)
+                            .setTitle("Data Uploaded to Cloud").setMessage(
+                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" +
+                                            "Uploaded " + api_response.get("number") + " entries for user: " + api_response.get("userid") + "\n" +
+                                            "Names: " + api_response.get("names") + "\n" +
+                                            "Message: " + api_response.get("message") + "\n"
+                            ).setPositiveButton("Close", null).show();
+                } else {
+                    new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_error)
+                            .setTitle("Error Uploading Data to Cloud").setMessage(
+                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" + "Message: " + api_response.get("message") + "\n"
+                            ).setPositiveButton("Close", null).show();
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }, (Response.ErrorListener) error -> Log.i("ERROR UPLOADING", "uploadToCloud: " + error)) {
             @Override
-            protected Map getParams() {
-                Map params = new HashMap();
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
 
-                params.put("userId", "wm123");
-                params.put("detailList", "[{\"name\":\"Android Conference\", \"description\" : \"wm123-test 123\"}]");
+                List<Trip> trips = mViewModel.tripList.getValue();
+                StringBuilder payload = new StringBuilder();
+                if (trips != null && trips.size() > 0) {
+                    for (Trip t : trips) {
+                        payload.append(t.toJson());
+                        payload.append(",");
+                    }
+                }
+                payload.deleteCharAt(payload.length() - 1);
 
+                params.put("jsonpayload", "{\"userId\":\"ht4872m\",\"detailList\":[" + payload + "]}");
+                Log.i("POST PARAMS", "getParams: " + params);
                 return params;
             }
 
             @Override
-            public Map getHeaders() {
-                HashMap headers = new HashMap();
+            public Map<String, String> getHeaders() {
+                HashMap<String, String> headers = new HashMap<>();
                 headers.put("Content-Type", "application/x-www-form-urlencoded");
                 return headers;
             }
         };
-
-        Log.i("REQUEST", "postData: " + jsonObjReq);
         queue.add(jsonObjReq);
     }
 }

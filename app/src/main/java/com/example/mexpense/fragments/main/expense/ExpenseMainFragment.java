@@ -3,7 +3,6 @@ package com.example.mexpense.fragments.main.expense;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,7 +26,6 @@ import com.example.mexpense.databinding.FragmentExpenseMainBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
 import com.example.mexpense.services.TripService;
-import com.example.mexpense.ultilities.Constants;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
@@ -64,8 +62,15 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                     adapter = new ExpenseAdapter(expenses, this);
                     binding.expenseRecyclerView.setAdapter(adapter);
                     binding.expenseRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    if(expenses.size() == 0){
+                        binding.txtEmptyExpenses.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.txtEmptyExpenses.setVisibility(View.INVISIBLE);
+                    }
                 }
         );
+
+
 
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),

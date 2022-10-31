@@ -157,4 +157,6 @@ public class ExpenseRepository extends SQLiteOpenHelper {
 
         db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
+
+
 }

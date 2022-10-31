@@ -32,20 +32,24 @@ public class LocationService implements LocationListener {
 
     @SuppressLint("MissingPermission")
     public void getLocation() {
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions((Activity) context, new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-            }, 101);
-        }
-        lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
-        Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        try {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions((Activity) context, new String[]{
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                }, 101);
+            }
+            lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 10, this);
+            Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-        if (location != null) {
-            setLatitude(latitude);
-            setLongitude(longitude);
-            Log.i("LOCATION SERVICE", "getLocation: " + getLatitude() + " / " + getLongitude());
+            if (location != null) {
+                setLatitude(latitude);
+                setLongitude(longitude);
+                Log.i("LOCATION SERVICE", "getLocation: " + getLatitude() + " / " + getLongitude());
+            }
+        } catch (Exception e) {
+            Log.i("ERROR GETTING LOCATION SERVICE", "getLocation: " + e);
         }
     }
 
