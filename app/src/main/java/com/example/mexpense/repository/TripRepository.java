@@ -5,9 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.example.mexpense.entity.Trip;
+import com.example.mexpense.services.SqlService;
+import com.example.mexpense.ultilities.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,49 +18,22 @@ public class TripRepository extends SQLiteOpenHelper {
 
     public static final String TABLE_NAME = "trips_table";
 
-    public static final String COLUMN_ID = "trip_id";
-    public static final String COLUMN_NAME = "name"; // Required
-    public static final String COLUMN_DESTINATION = "destination"; // Required
-    public static final String COLUMN_START_DATE = "startDate"; // Required
-    public static final String COLUMN_END_DATE = "endDate"; // Required
-    public static final String COLUMN_REQUIRED_ASSESSMENT = "assessment"; // Optional
-    public static final String COLUMN_PARTICIPANT = "participants";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_TOTAL = "total";
-
-
     private SQLiteDatabase database;
-
-    private static final String DATABASE_CREATE = String.format(
-            "CREATE TABLE %s (" +
-                    " %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s TEXT, " +
-                    " %s INTEGER, " +
-                    " %s TEXT, " +
-                    " %s REAL) ",
-            TABLE_NAME, COLUMN_ID, COLUMN_NAME, COLUMN_DESTINATION, COLUMN_START_DATE, COLUMN_END_DATE, COLUMN_REQUIRED_ASSESSMENT, COLUMN_PARTICIPANT, COLUMN_DESCRIPTION, COLUMN_TOTAL
-    );
-
-    public TripRepository(Context context) {
-        super(context, TABLE_NAME, null, 1);
-        database = getWritableDatabase();
-    }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         this.database = sqLiteDatabase;
-        database.execSQL(DATABASE_CREATE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        Log.w(this.getClass().getName(), TABLE_NAME + " upgraded from version " + oldVersion + "to new version " + newVersion);
         onCreate(database);
+    }
+
+    public TripRepository(Context context) {
+        super(context, "mExpense", null, 2);
+        SqlService sqlService = new SqlService(context);
+        database = sqlService.getDatabase();
     }
 
     public List<Trip> getTrips() {
@@ -72,7 +46,7 @@ public class TripRepository extends SQLiteOpenHelper {
     public Trip getTripById(int id) {
         Trip t = new Trip();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_ID + "=" + id, null);
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + Constants.COLUMN_ID_TRIP + "=" + id, null);
         while (c.moveToNext()){
             t.setId(Integer.parseInt(c.getString(0)));
             t.setName(c.getString(1));
@@ -92,44 +66,44 @@ public class TripRepository extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put(COLUMN_NAME, trip.getName());
-        cv.put(COLUMN_DESTINATION, trip.getDestination());
-        cv.put(COLUMN_START_DATE, trip.getStartDate());
-        cv.put(COLUMN_END_DATE, trip.getEndDate());
-        cv.put(COLUMN_REQUIRED_ASSESSMENT, trip.getRequiredAssessment() ? "1" : "0");
-        cv.put(COLUMN_PARTICIPANT, trip.getParticipants());
-        cv.put(COLUMN_DESCRIPTION, trip.getDescription());
-        cv.put(COLUMN_TOTAL, 0.0);
+        cv.put(Constants.COLUMN_NAME_TRIP , trip.getName());
+        cv.put(Constants.COLUMN_DESTINATION_TRIP , trip.getDestination());
+        cv.put(Constants.COLUMN_START_DATE_TRIP , trip.getStartDate());
+        cv.put(Constants.COLUMN_END_DATE_TRIP , trip.getEndDate());
+        cv.put(Constants.COLUMN_REQUIRED_ASSESSMENT_TRIP , trip.getRequiredAssessment() ? "1" : "0");
+        cv.put(Constants.COLUMN_PARTICIPANT_TRIP , trip.getParticipants());
+        cv.put(Constants.COLUMN_DESCRIPTION_TRIP , trip.getDescription());
+        cv.put(Constants.COLUMN_TOTAL_TRIP , 0.0);
 
-        db.insert(TABLE_NAME, COLUMN_DESCRIPTION, cv);
+        db.insert(TABLE_NAME, Constants.COLUMN_DESCRIPTION_TRIP , cv);
     }
 
     public void deleteTrip(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NAME, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.delete(TABLE_NAME, Constants.COLUMN_ID_TRIP  + "=?", new String[]{String.valueOf(id)});
     }
 
     public void updateTrip(int id, Trip trip){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
 
-        cv.put(COLUMN_NAME, trip.getName());
-        cv.put(COLUMN_DESTINATION, trip.getDestination());
-        cv.put(COLUMN_START_DATE, trip.getStartDate());
-        cv.put(COLUMN_END_DATE, trip.getEndDate());
-        cv.put(COLUMN_REQUIRED_ASSESSMENT, trip.getRequiredAssessment() ? "1" : "0");
-        cv.put(COLUMN_PARTICIPANT, trip.getParticipants());
-        cv.put(COLUMN_DESCRIPTION, trip.getDescription());
-        cv.put(COLUMN_TOTAL, trip.getTotal());
+        cv.put(Constants.COLUMN_NAME_TRIP , trip.getName());
+        cv.put(Constants.COLUMN_DESTINATION_TRIP , trip.getDestination());
+        cv.put(Constants.COLUMN_START_DATE_TRIP , trip.getStartDate());
+        cv.put(Constants.COLUMN_END_DATE_TRIP , trip.getEndDate());
+        cv.put(Constants.COLUMN_REQUIRED_ASSESSMENT_TRIP , trip.getRequiredAssessment() ? "1" : "0");
+        cv.put(Constants.COLUMN_PARTICIPANT_TRIP , trip.getParticipants());
+        cv.put(Constants.COLUMN_DESCRIPTION_TRIP , trip.getDescription());
+        cv.put(Constants.COLUMN_TOTAL_TRIP , trip.getTotal());
 
-        db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        db.update(TABLE_NAME, cv, Constants.COLUMN_ID_TRIP  + "=?", new String[]{String.valueOf(id)});
     }
 
     public void updateTotal(int id, double total){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
-        cv.put(COLUMN_TOTAL, total);
-        db.update(TABLE_NAME, cv, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
+        cv.put(Constants.COLUMN_TOTAL_TRIP , total);
+        db.update(TABLE_NAME, cv, Constants.COLUMN_ID_TRIP  + "=?", new String[]{String.valueOf(id)});
     }
 
     public void deleteAll() {
@@ -143,7 +117,7 @@ public class TripRepository extends SQLiteOpenHelper {
         String query = "SELECT * FROM " + TABLE_NAME + " WHERE ";
         boolean isFirst = true;
         if(!name.equals("")) {
-            query += COLUMN_NAME + " LIKE '%" + name + "%'";
+            query += Constants.COLUMN_NAME_TRIP  + " LIKE '%" + name + "%'";
             isFirst = false;
         }
 
@@ -152,7 +126,7 @@ public class TripRepository extends SQLiteOpenHelper {
                 query += " AND ";
             }
 
-            query += COLUMN_DESTINATION + " LIKE '%" + destination + "%'";
+            query += Constants.COLUMN_DESTINATION_TRIP  + " LIKE '%" + destination + "%'";
             isFirst = false;
         }
 
@@ -160,7 +134,7 @@ public class TripRepository extends SQLiteOpenHelper {
             query += " AND ";
         }
 
-        query += COLUMN_START_DATE + " >= '" + start + "' AND " + COLUMN_END_DATE + " <= '" + end + "'";
+        query += Constants.COLUMN_START_DATE_TRIP  + " >= '" + start + "' AND " + Constants.COLUMN_END_DATE_TRIP  + " <= '" + end + "'";
 
         Cursor c = db.rawQuery(query, null);
         return getList(c);
@@ -184,10 +158,4 @@ public class TripRepository extends SQLiteOpenHelper {
         return trips;
     }
 
-    public void getCloudData(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "";
-        db.rawQuery(query, null);
-
-    }
 }
