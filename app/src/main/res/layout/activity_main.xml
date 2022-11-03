@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/whitesmoke"
     android:backgroundTint="@color/whitesmoke"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
     <androidx.fragment.app.FragmentContainerView

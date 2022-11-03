@@ -4,7 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -69,6 +73,7 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
                     binding.textExpenseDate.setText(Utilities.convertDate(expense.getDate(), false));
                     binding.textExpenseCategory.setText(expense.getCategory());
                     binding.iconExpense.setImageResource(getIcon(expense.getCategory()));
+                    setImageView(expense.getImage());
                 }
         );
         service.getExpenseById(mViewModel.expense, expenseId);
@@ -83,6 +88,36 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
         setHasOptionsMenu(true);
 
         return binding.getRoot();
+    }
+
+    private void setImageView(String imagePath) {
+        if(imagePath.equals("")) {
+            binding.expenseImageView.setImageResource(R.drawable.ic_no_image_foreground);
+            return;
+        }
+
+        int targetW = 400;
+        int targetH = 320;
+
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+
+        BitmapFactory.decodeFile(imagePath, bmOptions);
+
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+        int scaleFactor = Math.max(1, Math.min(photoW/targetW, photoH/targetH));
+
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(90);
+        Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+        binding.expenseImageView.setImageBitmap(rotated);
     }
 
     @Override
@@ -139,7 +174,6 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
 
                 }).setNegativeButton("No", null).show();
     }
-
 
     @SuppressLint("MissingPermission")
     @Override

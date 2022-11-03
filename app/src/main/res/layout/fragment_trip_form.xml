@@ -26,12 +26,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
+
             android:focusable="false"
-
             android:focusableInTouchMode="false"
-            android:fontFamily="@font/founders_grotesk_regular"
 
+            android:fontFamily="@font/founders_grotesk_regular"
             android:hint="Select A Trip Type"
+
             app:boxCornerRadiusBottomEnd="10dp"
             app:boxCornerRadiusBottomStart="10dp"
             app:boxCornerRadiusTopEnd="10dp"
@@ -84,8 +85,7 @@
                 app:boxCornerRadiusTopStart="10dp"
                 app:layout_constraintEnd_toStartOf="@+id/layoutEndDate"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:startIconDrawable="@drawable/ic_date">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputStartDate"
@@ -100,7 +100,7 @@
                     android:fontFamily="@font/founders_grotesk_regular"
 
                     android:maxLines="1"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -119,7 +119,7 @@
                 app:layout_constraintStart_toEndOf="@+id/layoutStartDate"
                 app:layout_constraintTop_toTopOf="parent"
 
-                app:startIconDrawable="@drawable/ic_date">
+                >
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/inputEndDate"
@@ -134,7 +134,7 @@
                     android:fontFamily="@font/founders_grotesk_regular"
 
                     android:maxLines="1"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

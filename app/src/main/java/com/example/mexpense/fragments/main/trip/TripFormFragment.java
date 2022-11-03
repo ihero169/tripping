@@ -112,7 +112,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
                 trip -> {
-                    if(savedInstanceState != null){
+                    if (savedInstanceState != null) {
                         binding.inputTextTripType.setText(savedInstanceState.getString(NAME_KEY));
                         getTrips();
                         binding.inputStartDate.setText(savedInstanceState.getString(START_DATE_KEY));
@@ -121,9 +121,12 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                         binding.inputTextDescription.setText(savedInstanceState.getString(DESCRIPTION_KEY));
                         binding.inputTextParticipant.setText(savedInstanceState.getString(PARTICIPANT_KEY));
                         binding.switchRequiredAssessment.setChecked(savedInstanceState.getBoolean(ASSESSMENT_KEY));
-                    }
-                    else{
-                        binding.inputTextTripType.setText(trip.getName());
+                    } else {
+                        if(tripId == -1) {
+                            binding.inputTextTripType.setText(Constants.trips[0]);
+                        } else {
+                            binding.inputTextTripType.setText(trip.getName());
+                        }
                         getTrips();
                         binding.inputStartDate.setText(trip.getStartDate());
                         binding.inputEndDate.setText(trip.getEndDate());
@@ -144,7 +147,13 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.ic_back);
         setHasOptionsMenu(true);
-        ab.setTitle("Editing Trip");
+
+        if (tripId == -1) {
+            ab.setTitle("New Trip");
+        } else {
+            ab.setTitle("Editing Trip " + tripId);
+        }
+
 
         requireActivity().invalidateOptionsMenu();
 
@@ -183,7 +192,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putString(NAME_KEY, editTripType.getText().toString());
         savedInstanceState.putString(DESTINATION_KEY, editDestination.getText().toString());
         savedInstanceState.putString(START_DATE_KEY, editStartDate.getText().toString());
@@ -215,8 +224,9 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
 
     private void handleSave() {
         if (validation()) {
+            String assessmentRequired = assessment.isChecked() ? "Assessment Required" : "Assessment Not Required";
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation").setMessage("Are you sure?")
+                    .setTitle("Confirmation").setMessage("Are you sure?" + "\nTrip Type: " + editTripType.getText().toString() + "\nDestination: " + editDestination.getText().toString() + "\nFrom " + editStartDate.getText().toString() + " to " + editEndDate.getText().toString() + "\nParticipants: " + Integer.parseInt(editParticipant.getText().toString()) + "\n" + assessmentRequired + "\nOther notes: " + editDescription.getText().toString())
                     .setPositiveButton("Yes", (arg0, arg1) -> {
                         if (tripId == -1) {
                             service.addTrip(getFormInput());
@@ -231,12 +241,6 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
 
     private boolean validation() {
         boolean result = true;
-        if (editTripType.getText().toString().equals("")) {
-            binding.layoutTripType.setError("Please select the trip type");
-            result = false;
-        } else {
-            binding.layoutTripType.setError(null);
-        }
 
         if (editDestination.getText().toString().equals("")) {
             binding.layoutDestination.setError("Please enter a destination");
@@ -255,13 +259,13 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         if (editEndDate.getText().toString().equals("")) {
             binding.layoutEndDate.setError("End date missing");
             result = false;
-        }  else {
+        } else {
             binding.layoutEndDate.setError(null);
         }
 
-        if(!editEndDate.getText().toString().equals("") && !editStartDate.getText().toString().equals("")){
+        if (!editEndDate.getText().toString().equals("") && !editStartDate.getText().toString().equals("")) {
             if (!dateValidation(binding.inputStartDate.getText().toString(), binding.inputEndDate.getText().toString())) {
-                binding.layoutStartDate.setError("Invalid start date");
+                binding.layoutStartDate.setError("Start date must be before end date");
                 result = false;
             } else {
                 binding.layoutStartDate.setError(null);

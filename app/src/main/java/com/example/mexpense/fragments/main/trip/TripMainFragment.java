@@ -104,9 +104,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                     binding.tripRecyclerView.setAdapter(adapter);
                     binding.tripRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     if (trips.size() == 0) {
-                        binding.txtNotifyEmptyTrip.setVisibility(View.VISIBLE);
+                        binding.emptyTripLayout.setVisibility(View.VISIBLE);
                     } else {
-                        binding.txtNotifyEmptyTrip.setVisibility(View.INVISIBLE);
+                        binding.emptyTripLayout.setVisibility(View.INVISIBLE);
                     }
                 }
         );
@@ -322,7 +322,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
     private void resetDatabase() {
         new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Confirmation").setMessage("Are you sure?")
+                .setTitle("Confirmation").setMessage("The database will be reset and this action cannot be undone, are you sure?")
                 .setPositiveButton("Yes", (arg0, arg1) -> {
                     service.resetDatabase();
                     List<Trip> newList = new ArrayList<>();

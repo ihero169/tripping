@@ -9,16 +9,45 @@
     android:padding="0dp"
     tools:context=".fragments.main.trip.TripMainFragment">
 
+    <LinearLayout
+        android:id="@+id/emptyTripLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-90dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tripRecyclerView">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_empty" />
+
+        <TextView
+            android:id="@+id/txtNotifyEmptyTrip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:fontFamily="@font/founders_grotesk_medium"
+            android:text="Please add some Trips"
+            android:textSize="16sp" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tripRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="-144dp"
+        android:layout_marginTop="-156dp"
         android:padding="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mainLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/mainLayout">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
@@ -260,15 +289,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:ignore="SpeakableTextPresentCheck" />
-
-    <TextView
-        android:id="@+id/txtNotifyEmptyTrip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Please add some Expenses"
-        app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tripRecyclerView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

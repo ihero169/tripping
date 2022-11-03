@@ -2,12 +2,16 @@
 package com.example.mexpense.fragments.main.expense;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +30,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -40,10 +45,13 @@ import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
@@ -60,6 +68,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private TextInputLayout categoryLayout;
     private TextInputLayout costLayout;
+    private TextInputLayout amountLayout;
     private TextInputLayout dateLayout;
 
     private AutoCompleteTextView editCategory;
@@ -88,7 +97,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         mViewModel = new ViewModelProvider(this).get(ExpenseFormViewModel.class);
         binding = FragmentExpenseFormBinding.inflate(inflater, container, false);
         service = new ExpenseService(getContext());
-
         locationService = new LocationService(getContext());
         locationService.getLocation();
 
@@ -103,6 +111,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         categoryLayout = binding.textInputLayoutCategory;
         costLayout = binding.textInputLayoutCost;
         dateLayout = binding.textInputLayoutDate;
+        amountLayout = binding.textInputLayoutAmount;
+
         editCategory = binding.inputTextCategories;
         editCost = binding.inputCost;
         editDate = binding.inputDate;
@@ -119,10 +129,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             updateDate();
         };
 
+
         mViewModel.expense.observe(
                 getViewLifecycleOwner(),
                 expense -> {
-                    if(savedInstanceState != null){
+                    if (savedInstanceState != null) {
                         binding.inputTextCategories.setText(savedInstanceState.getString(CATEGORY_KEY));
                         getCategories();
                         binding.inputDate.setText(expense.getDate());
@@ -130,18 +141,31 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         binding.inputAmount.setText(String.valueOf(savedInstanceState.getInt(AMOUNT_KEY)));
                         binding.inputTextComment.setText(savedInstanceState.getString(COMMENT_KEY));
                     } else {
-                        binding.inputTextCategories.setText(expense.getCategory());
+                        if (expenseId == -1) {
+                            editCategory.setText(Constants.categories[0]);
+                        } else {
+                            editCategory.setText(expense.getCategory());
+                        }
                         getCategories();
                         binding.inputDate.setText(expense.getDate());
                         binding.inputCost.setText(String.valueOf(expense.getCost()));
                         binding.inputAmount.setText(String.valueOf(expense.getAmount()));
                         binding.inputTextComment.setText(expense.getComment());
+
+                        if (expense.getImage() == "") {
+                            buttonAddImage.setBackgroundColor(Color.BLACK);
+                        } else {
+                            buttonAddImage.setBackgroundColor(Color.RED);
+                            buttonAddImage.setText("Update Image");
+                        }
                     }
                 }
         );
+
+
         service.getExpenseById(mViewModel.expense, expenseId);
 
-        AppCompatActivity app = (AppCompatActivity)getActivity();
+        AppCompatActivity app = (AppCompatActivity) getActivity();
         ActionBar ab = app.getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayShowHomeEnabled(true);
@@ -156,14 +180,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_trip_fragment, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case android.R.id.home:
                 Utilities.hideInput(getActivity(), getView());
                 // Close service
@@ -174,7 +198,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             case R.id.action_delete:
                 handleDelete();
                 return true;
-            default: return super.onOptionsItemSelected(item);
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -186,13 +211,13 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         menu.findItem(R.id.action_edit).setVisible(false);
         menu.findItem(R.id.action_upload).setVisible(false);
         if (e != null
-                && e.getId() == Constants.NEW_EXPENSE){
+                && e.getId() == Constants.NEW_EXPENSE) {
             menu.findItem(R.id.action_delete).setVisible(false);
         }
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState){
+    public void onSaveInstanceState(Bundle savedInstanceState) {
         savedInstanceState.putString(CATEGORY_KEY, editCategory.getText().toString());
         savedInstanceState.putDouble(COST_KEY, Double.parseDouble(editCost.getText().toString()));
         savedInstanceState.putInt(AMOUNT_KEY, Integer.parseInt(editAmount.getText().toString()));
@@ -221,40 +246,74 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         }
     }
 
-    private void setImage(){
-        int MY_PERMISSIONS_REQUEST_CAMERA=0;
-        Log.i("CAMERA ACCESS", "setImage:  setting image");
-        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
-        {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA))
-            {
-                openCamera();
+    private void setImage() {
+        int MY_PERMISSIONS_REQUEST_CAMERA = 0;
+        Log.i("CAMERA ACCESS", "setImage");
+        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
             }
-            else
-            {
-                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA );
+        } else {
+            try {
+                openCamera();
+            } catch (Exception e) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
             }
         }
     }
 
-    private void openCamera(){
+    private void openCamera() {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(cameraIntent, 1001);
+        File photoFile = null;
+
+        try {
+            Log.i("FILE CREATION", "CREATING FILES");
+            photoFile = createImageFile();
+        } catch (IOException ex) {
+            Log.i("FILE ERROR", ex.toString());
+        }
+
+        Log.i("FILE CREATION", "FILE CREATED ");
+
+        Uri photoURI = FileProvider.getUriForFile(getContext(), "com.example.android.fileprovider", photoFile);
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        Log.i("FILE CREATION", "URI: " + photoURI.toString());
+        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
+    }
+
+    String currentPhotoPath = "";
+    Uri contentUri;
+    private Bitmap mImageBitmap;
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private File createImageFile() throws IOException {
+        @SuppressLint("SimpleDateFormat")
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Bitmap photo = (Bitmap) data.getExtras().get("data");
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Log.i("CAMERA", "IMAGE TAKEN");
+        File f = new File(currentPhotoPath);
+        contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        getContext().sendBroadcast(mediaScanIntent);
     }
 
-    private void getCategories(){
+    private void getCategories() {
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.categories);
         editCategory.setAdapter(adapter);
         editCategory.setOnClickListener(this);
     }
 
-    private void handleDelete(){
+    private void handleDelete() {
         new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle("Confirmation").setMessage("Are you sure?")
                 .setPositiveButton("Yes", (arg0, arg1) -> {
@@ -294,13 +353,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         String startDate = getArguments().getString("startDate");
         String endDate = getArguments().getString("endDate");
 
-        if (editCategory.getText().toString().equals("")) {
-            categoryLayout.setError("Please select a category");
-            result = false;
-        } else {
-            categoryLayout.setError(null);
-        }
-
         if (editAmount.getText().toString().equals("")) {
             binding.textInputLayoutAmount.setError("Please enter the amount");
             result = false;
@@ -312,13 +364,19 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             dateLayout.setError("Please select a date");
             result = false;
         } else {
-            if(!dateValidation(startDate, endDate, binding.inputDate.getText().toString())){
+            if (!dateValidation(startDate, endDate, binding.inputDate.getText().toString())) {
                 dateLayout.setError("Expense date must be within " + startDate + " and " + endDate);
                 result = false;
-            }
-            else {
+            } else {
                 dateLayout.setError(null);
             }
+        }
+
+        if (Integer.parseInt(editAmount.getText().toString()) == 0) {
+            amountLayout.setError("Please enter an amount");
+            result = false;
+        } else {
+            amountLayout.setError(null);
         }
 
         if (Float.parseFloat(editCost.getText().toString()) == 0.0) {
@@ -331,12 +389,12 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         return result;
     }
 
-    private boolean dateValidation(String startStr, String endStr, String expenseStr){
+    private boolean dateValidation(String startStr, String endStr, String expenseStr) {
         DateTimeFormatter sql = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
         LocalDate startDate = LocalDate.parse(startStr, sql);
         LocalDate endDate = LocalDate.parse(endStr, sql);
         LocalDate expenseDate = LocalDate.parse(expenseStr, sql);
-        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate) || expenseDate.isEqual(startDate)  || expenseDate.isEqual(endDate);
+        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate) || expenseDate.isEqual(startDate) || expenseDate.isEqual(endDate);
     }
 
     private Expense getFormInput() {
@@ -346,7 +404,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         double cost = Double.parseDouble(editCost.getText().toString());
         int amount = Integer.parseInt(editAmount.getText().toString());
         locationService.getLocation();
-        return new Expense(-1, category, cost, amount, date, comment, tripId, locationService.getLatitude(), locationService.getLongitude());
+
+        return new Expense(-1, category, cost, amount, date, comment, tripId, locationService.getLatitude(), locationService.getLongitude(), currentPhotoPath);
     }
 
     private void updateDate() {
@@ -354,9 +413,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         SimpleDateFormat dateFormat = new SimpleDateFormat(format, Locale.US);
         editDate.setText(dateFormat.format(myCalendar.getTime()));
     }
+
     public void setDate() {
         DateTimeFormatter source = DateTimeFormatter.ofPattern(Constants.DATE_FORMAT_DATABASE);
-        if(expenseId == -1){
+        if (expenseId == -1) {
             LocalDate startDate = LocalDate.parse(getArguments().getString("startDate"), source);
             setCalendar(startDate.getYear(), startDate.getMonthValue() - 1, startDate.getDayOfMonth());
         } else {
@@ -366,7 +426,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         new DatePickerDialog(getContext(), date, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void setCalendar(int year, int month, int day){
+    private void setCalendar(int year, int month, int day) {
         myCalendar.set(Calendar.YEAR, year);
         myCalendar.set(Calendar.MONTH, month);
         myCalendar.set(Calendar.DAY_OF_MONTH, day);

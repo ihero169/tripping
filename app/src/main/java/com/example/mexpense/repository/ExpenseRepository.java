@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -21,7 +22,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
 
     private SQLiteDatabase database;
 
-    public ExpenseRepository(@Nullable Context context) {
+    public ExpenseRepository(Context context) {
         super(context, "mExpense", null, 2);
         SqlService sqlService = new SqlService(context);
         database = sqlService.getDatabase();
@@ -34,7 +35,6 @@ public class ExpenseRepository extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
-        database.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(database);
     }
 
@@ -52,7 +52,8 @@ public class ExpenseRepository extends SQLiteOpenHelper {
                 int trip_id = Integer.parseInt(c.getString(6));
                 double latitude = Double.parseDouble(c.getString(7));
                 double longitude = Double.parseDouble(c.getString(8));
-                Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude);
+                String imagePath = c.getString(9);
+                Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude, imagePath);
                 expenses.add(expense);
             }
         }
@@ -74,6 +75,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
             e.setTripId(Integer.parseInt(c.getString(6)));
             e.setLatitude(Double.parseDouble(c.getString(7)));
             e.setLongitude(Double.parseDouble(c.getString(8)));
+            e.setImage(c.getString(9));
         }
         c.close();
         return e;
@@ -90,6 +92,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         cv.put(Constants.COLUMN_TRIP_ID_EXPENSE, expense.getTripId());
         cv.put(Constants.COLUMN_LATITUDE_EXPENSE, expense.getLatitude());
         cv.put(Constants.COLUMN_LONGITUDE_EXPENSE, expense.getLongitude());
+        cv.put(Constants.COLUMN_IMAGE_PATH_EXPENSE, expense.getImage());
         db.insert(TABLE_NAME, Constants.COLUMN_COMMENT_EXPENSE, cv);
     }
 
@@ -107,6 +110,7 @@ public class ExpenseRepository extends SQLiteOpenHelper {
         cv.put(Constants.COLUMN_AMOUNT_EXPENSE, expense.getAmount());
         cv.put(Constants.COLUMN_DATE_EXPENSE, expense.getDate());
         cv.put(Constants.COLUMN_COMMENT_EXPENSE, expense.getComment());
+        cv.put(Constants.COLUMN_IMAGE_PATH_EXPENSE, expense.getImage());
 
         db.update(TABLE_NAME, cv, Constants.COLUMN_ID_EXPENSE + "=?", new String[]{String.valueOf(id)});
     }

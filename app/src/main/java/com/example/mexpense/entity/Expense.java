@@ -5,7 +5,6 @@ import androidx.annotation.NonNull;
 import com.example.mexpense.ultilities.Constants;
 import com.google.gson.Gson;
 
-
 public class Expense {
     private int id;
     private String category;
@@ -16,9 +15,9 @@ public class Expense {
     private int tripId;
     private double latitude;
     private double longitude;
-    private byte[] image;
+    private String imagePath;
 
-    public Expense(int id, String category, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude) {
+    public Expense(int id, String category, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude, String imagePath) {
         this.id = id;
         this.category = category;
         this.date = date;
@@ -28,6 +27,7 @@ public class Expense {
         this.tripId = tripId;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.imagePath = imagePath;
     }
 
     public Expense() {
@@ -39,7 +39,7 @@ public class Expense {
         comment = "";
         latitude = 0.0;
         longitude = 0.0;
-        image = new byte[0];
+        imagePath = "";
     }
 
     public String toJson() {
@@ -142,11 +142,11 @@ public class Expense {
         this.amount = amount;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImage() {
+        return imagePath;
     }
 
-    public void setImage(byte[] image) {
-        this.image = image;
+    public void setImage(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

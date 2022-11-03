@@ -7,8 +7,6 @@ public class Constants {
     public static final String DATE_FORMAT = "dd MMM, yyyy";
     public static final String DATE_FORMAT_DATABASE = "yyyy-MM-dd";
 
-    public static final int REQUEST_PERMISSION_FINE_LOCATION = 1;
-
     public static final String[] categories = {"Travel", "Flight", "Telephone", "Mortgage", "Meals", "Refreshments", "Gifts", "Medical", "Printing"};
     public static final String[] trips = {"Meeting", "Conference", "Exhibit", "Event", "Team-building"};
 
@@ -26,7 +24,7 @@ public class Constants {
     public static final String COLUMN_TOTAL_TRIP = "total";
 
     public static final String COLUMN_ID_EXPENSE = "expense_id";
-    public static final String COLUMN_CATEGORY_EXPENSE = "category"; // Required
+    public static final String COLUMN_CATEGORY_EXPENSE = "name"; // Required
     public static final String COLUMN_COST_EXPENSE = "cost"; // Required
     public static final String COLUMN_AMOUNT_EXPENSE = "amount";
     public static final String COLUMN_DATE_EXPENSE = "date"; // Required
@@ -34,5 +32,5 @@ public class Constants {
     public static final String COLUMN_TRIP_ID_EXPENSE = "trip_id";
     public static final String COLUMN_LATITUDE_EXPENSE = "latitude";
     public static final String COLUMN_LONGITUDE_EXPENSE = "longitude";
-    public static final String COLUMN_IMAGE_EXPENSE = "image";
+    public static final String COLUMN_IMAGE_PATH_EXPENSE = "image";
 }

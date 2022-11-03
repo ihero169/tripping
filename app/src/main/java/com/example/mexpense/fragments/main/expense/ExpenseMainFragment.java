@@ -63,14 +63,12 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                     binding.expenseRecyclerView.setAdapter(adapter);
                     binding.expenseRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                     if(expenses.size() == 0){
-                        binding.txtEmptyExpenses.setVisibility(View.VISIBLE);
+                        binding.emptyExpenseLayout.setVisibility(View.VISIBLE);
                     } else {
-                        binding.txtEmptyExpenses.setVisibility(View.INVISIBLE);
+                        binding.emptyExpenseLayout.setVisibility(View.INVISIBLE);
                     }
                 }
         );
-
-
 
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
