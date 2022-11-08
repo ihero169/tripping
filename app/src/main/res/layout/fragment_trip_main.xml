@@ -13,7 +13,6 @@
         android:id="@+id/emptyTripLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-90dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="@+id/tripRecyclerView"
         app:layout_constraintEnd_toEndOf="parent"

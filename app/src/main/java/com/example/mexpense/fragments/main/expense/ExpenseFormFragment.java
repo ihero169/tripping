@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -152,7 +153,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         binding.inputAmount.setText(String.valueOf(expense.getAmount()));
                         binding.inputTextComment.setText(expense.getComment());
 
-                        if (expense.getImage() == "") {
+                        if (expense.getImage().equals("")) {
                             buttonAddImage.setBackgroundColor(Color.BLACK);
                         } else {
                             buttonAddImage.setBackgroundColor(Color.RED);
@@ -250,8 +251,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         int MY_PERMISSIONS_REQUEST_CAMERA = 0;
         Log.i("CAMERA ACCESS", "setImage");
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                openCamera();
+            } else{
+                Toast.makeText(getContext(), "Camera access must be allowed to capture image", Toast.LENGTH_SHORT).show();
             }
         } else {
             try {
@@ -305,6 +309,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         getContext().sendBroadcast(mediaScanIntent);
+
+        if (!currentPhotoPath.equals("")) {
+            buttonAddImage.setBackgroundColor(Color.RED);
+            buttonAddImage.setText("Change Image");
+        }
     }
 
     private void getCategories() {

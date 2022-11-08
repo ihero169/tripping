@@ -33,4 +33,6 @@ public class Constants {
     public static final String COLUMN_LATITUDE_EXPENSE = "latitude";
     public static final String COLUMN_LONGITUDE_EXPENSE = "longitude";
     public static final String COLUMN_IMAGE_PATH_EXPENSE = "image";
+
+    public static final String EXPENSE_TABLE_NAME = "expenses_table";
 }

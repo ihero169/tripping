@@ -30,13 +30,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.TripAdapter;
 import com.example.mexpense.databinding.FragmentTripMainBinding;
+import com.example.mexpense.entity.Expense;
 import com.example.mexpense.entity.Trip;
+import com.example.mexpense.repository.ExpenseRepository;
 import com.example.mexpense.services.TripService;
 import com.example.mexpense.ultilities.Constants;
 import com.example.mexpense.ultilities.Utilities;
@@ -141,6 +142,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                         editDestination.getText().toString(),
                         editStartDate.getText().toString(),
                         editEndDate.getText().toString());
+                showEmptySearch();
             }
         });
 
@@ -170,6 +172,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                         editDestination.getText().toString(),
                         editStartDate.getText().toString(),
                         editEndDate.getText().toString());
+                showEmptySearch();
             }
         });
 
@@ -202,6 +205,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                         editDestination.getText().toString(),
                         editStartDate.getText().toString(),
                         editEndDate.getText().toString());
+                showEmptySearch();
             }
         });
 
@@ -223,6 +227,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                         editDestination.getText().toString(),
                         editStartDate.getText().toString(),
                         editEndDate.getText().toString());
+                showEmptySearch();
             }
         });
 
@@ -301,6 +306,16 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
     }
 
+    private void showEmptySearch(){
+        if(mViewModel.tripList.getValue().size() == 0){
+            binding.emptyTripLayout.setVisibility(View.VISIBLE);
+            binding.txtNotifyEmptyTrip.setText("No matching trips were found!");
+        } else {
+            binding.emptyTripLayout.setVisibility(View.INVISIBLE);
+            binding.txtNotifyEmptyTrip.setText("Please add some trips");
+        }
+    }
+
     private void toggleSearchField() {
         if (isOpen) {
             binding.mainLayout.animate().translationY(-binding.sortLayout.getHeight()).setDuration(500);
@@ -356,7 +371,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private void uploadToCloud() {
         String url = getString(R.string.service_url);
         RequestQueue queue = Volley.newRequestQueue(getContext());
-        StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, (Response.Listener<String>) response -> {
+        StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, response -> {
             try {
                 JSONObject api_response = new JSONObject(response);
                 Log.i("RESPONSE", "uploadToCloud: " + api_response);
@@ -377,20 +392,22 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }, (Response.ErrorListener) error -> Log.i("ERROR UPLOADING", "uploadToCloud: " + error)) {
+        }, error -> Log.i("ERROR UPLOADING", "uploadToCloud: " + error)) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-
-                List<Trip> trips = mViewModel.tripList.getValue();
+                ExpenseRepository expenseRepository = new ExpenseRepository(getContext());
+                List<Expense> expenses = expenseRepository.getExpenses();
                 StringBuilder payload = new StringBuilder();
-                if (trips != null && trips.size() > 0) {
-                    for (Trip t : trips) {
-                        payload.append(t.toJson());
-                        payload.append(",");
+
+                if (expenses != null && expenses.size() > 0) {
+                    for(int i = 0; i < expenses.size(); i++){
+                        payload.append(expenses.get(i).toJson());
+                        if(i<expenses.size()-1){
+                            payload.append(",");
+                        }
                     }
                 }
-                payload.deleteCharAt(payload.length() - 1);
 
                 params.put("jsonpayload", "{\"userId\":\"ht4872m\",\"detailList\":[" + payload + "]}");
                 Log.i("POST PARAMS", "getParams: " + params);

@@ -81,6 +81,7 @@ public class TripRepository extends SQLiteOpenHelper {
     public void deleteTrip(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_NAME, Constants.COLUMN_ID_TRIP  + "=?", new String[]{String.valueOf(id)});
+        db.delete(Constants.EXPENSE_TABLE_NAME, Constants.COLUMN_TRIP_ID_EXPENSE  + "=?", new String[]{String.valueOf(id)});
     }
 
     public void updateTrip(int id, Trip trip){

@@ -5,9 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
-
-import androidx.annotation.Nullable;
 
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.SqlService;
@@ -36,6 +33,27 @@ public class ExpenseRepository extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         onCreate(database);
+    }
+
+    public List<Expense> getExpenses() {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        while (c.moveToNext()) {
+            String category = c.getString(1);
+            double cost = Double.parseDouble(c.getString(2));
+            int amount = Integer.parseInt(c.getString(3));
+            String date = c.getString(4);
+            String comment = c.getString(5);
+            int trip_id = Integer.parseInt(c.getString(6));
+            double latitude = Double.parseDouble(c.getString(7));
+            double longitude = Double.parseDouble(c.getString(8));
+            String imagePath = c.getString(9);
+            Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude, imagePath);
+            expenses.add(expense);
+        }
+        c.close();
+        return expenses;
     }
 
     public List<Expense> getExpenses(int trip) {

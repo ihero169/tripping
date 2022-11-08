@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 
 public class Expense {
     private int id;
-    private String category;
+    private String name;
     private String date;
     private double cost;
     private int amount;
@@ -17,9 +17,9 @@ public class Expense {
     private double longitude;
     private String imagePath;
 
-    public Expense(int id, String category, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude, String imagePath) {
+    public Expense(int id, String name, double cost, int amount, String date, String comment, int tripId, double latitude, double longitude, String imagePath) {
         this.id = id;
-        this.category = category;
+        this.name = name;
         this.date = date;
         this.cost = cost;
         this.amount = amount;
@@ -32,7 +32,7 @@ public class Expense {
 
     public Expense() {
         id = Constants.NEW_EXPENSE;
-        category = "";
+        name = "";
         date = "";
         cost = 0;
         amount = 0;
@@ -58,7 +58,7 @@ public class Expense {
     public String toString() {
         return "Expense{" +
                 "id=" + id +
-                ", category='" + category + '\'' +
+                ", name='" + name + '\'' +
                 ", date='" + date + '\'' +
                 ", cost=" + cost +
                 ", amount=" + amount +
@@ -79,11 +79,11 @@ public class Expense {
     }
 
     public String getCategory() {
-        return category;
+        return name;
     }
 
     public void setCategory(String category) {
-        this.category = category;
+        this.name = category;
     }
 
     public String getDate() {
