@@ -134,4 +134,24 @@ public class ExpenseRepository extends SQLiteOpenHelper {
     }
 
 
+    public List<Expense> getAllExpenses() {
+        List<Expense> expenses = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        while (c.moveToNext()) {
+            String category = c.getString(1);
+            double cost = Double.parseDouble(c.getString(2));
+            int amount = Integer.parseInt(c.getString(3));
+            String date = c.getString(4);
+            String comment = c.getString(5);
+            int trip_id = Integer.parseInt(c.getString(6));
+            double latitude = Double.parseDouble(c.getString(7));
+            double longitude = Double.parseDouble(c.getString(8));
+            String imagePath = c.getString(9);
+            Expense expense = new Expense(Integer.parseInt(c.getString(0)), category, cost, amount, date, comment, trip_id, latitude, longitude, imagePath);
+            expenses.add(expense);
+        }
+        c.close();
+        return expenses;
+    }
 }

@@ -8,6 +8,7 @@ import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -153,11 +155,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         binding.inputAmount.setText(String.valueOf(expense.getAmount()));
                         binding.inputTextComment.setText(expense.getComment());
 
-                        if (expense.getImage().equals("")) {
-                            buttonAddImage.setBackgroundColor(Color.BLACK);
+                        if(!expense.getImage().equals("")){
+                            buttonAddImage.setText("Change Image");
+                            binding.previewIcon.setImageBitmap(Utilities.getImageFromURL(expense.getImage(), 52, 52));
                         } else {
-                            buttonAddImage.setBackgroundColor(Color.RED);
-                            buttonAddImage.setText("Update Image");
+                            binding.previewIcon.setImageResource(R.drawable.ic_camera);
                         }
                     }
                 }
@@ -172,7 +174,13 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         ab.setDisplayShowHomeEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setHomeAsUpIndicator(R.drawable.ic_back);
-        ab.setTitle("Editing Expense");
+
+        if(expenseId == Constants.NEW_EXPENSE){
+            ab.setTitle("Add Expense");
+        } else {
+            ab.setTitle("Editing Expense");
+        }
+
         setHasOptionsMenu(true);
 
         requireActivity().invalidateOptionsMenu();
@@ -287,7 +295,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     String currentPhotoPath = "";
     Uri contentUri;
-    private Bitmap mImageBitmap;
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private File createImageFile() throws IOException {
@@ -311,8 +318,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         getContext().sendBroadcast(mediaScanIntent);
 
         if (!currentPhotoPath.equals("")) {
-            buttonAddImage.setBackgroundColor(Color.RED);
             buttonAddImage.setText("Change Image");
+            binding.previewIcon.setImageBitmap(Utilities.getImageFromURL(currentPhotoPath, 52 , 52));
+        } else {
+            binding.previewIcon.setImageResource(R.drawable.ic_camera);
         }
     }
 

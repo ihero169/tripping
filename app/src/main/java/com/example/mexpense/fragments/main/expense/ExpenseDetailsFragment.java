@@ -4,9 +4,6 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -58,7 +55,12 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
         mViewModel = new ViewModelProvider(this).get(ExpenseDetailsViewModel.class);
         binding = FragmentExpenseDetailsBinding.inflate(inflater, container, false);
         service = new ExpenseService(getContext());
-        expenseId = getArguments().getInt("expenseId");
+
+        try{
+            expenseId = getArguments().getInt("expenseId");
+        } catch (Exception e){
+            Log.i("ID EXCEPTION", "onCreateView: " + e);
+        }
 
         mapView = binding.mapView;
         mapView.onCreate(savedInstanceState);
@@ -95,29 +97,7 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
             binding.expenseImageView.setImageResource(R.drawable.ic_no_image_foreground);
             return;
         }
-
-        int targetW = 400;
-        int targetH = 320;
-
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-
-        BitmapFactory.decodeFile(imagePath, bmOptions);
-
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-        int scaleFactor = Math.max(1, Math.min(photoW/targetW, photoH/targetH));
-
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, bmOptions);
-
-        Matrix matrix = new Matrix();
-        matrix.postRotate(90);
-        Bitmap rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-        binding.expenseImageView.setImageBitmap(rotated);
+        binding.expenseImageView.setImageBitmap(Utilities.getImageFromURL(imagePath, 400, 320));
     }
 
     @Override
@@ -167,8 +147,14 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
                 .setTitle("Confirmation").setMessage("Are you sure?")
                 .setPositiveButton("Yes", (arg0, arg1) -> {
                     Bundle bundle = new Bundle();
-                    bundle.putInt("tripId", mViewModel.expense.getValue().getTripId());
-                    service.deleteExpense(expenseId);
+
+                    try{
+                        bundle.putInt("tripId", mViewModel.expense.getValue().getTripId());
+                        service.deleteExpense(expenseId);
+                    } catch (Exception e){
+                        Log.i("ERROR", "handleDelete: " + e);
+                    }
+
                     Utilities.hideInput(getActivity(), getView());
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
 
@@ -190,9 +176,13 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
 
         Expense e = mViewModel.expense.getValue();
 
-        LatLng location = new LatLng(e.getLatitude(), e.getLongitude());
-        map.addMarker(new MarkerOptions().position(location).title(e.getCategory()));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+        try {
+            LatLng location = new LatLng(e.getLatitude(), e.getLongitude());
+            map.addMarker(new MarkerOptions().position(location).title(e.getCategory()));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f));
+        } catch (Exception ex){
+            Log.i("LOCATION", ex.toString());
+        }
     }
 
     @Override
