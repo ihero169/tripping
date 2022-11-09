@@ -234,9 +234,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
         AppCompatActivity app = (AppCompatActivity) getActivity();
         ActionBar ab = app.getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
-        ab.setDisplayShowHomeEnabled(true);
-        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(false);
+        ab.setDisplayShowHomeEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(false);
         ab.setHomeAsUpIndicator(R.drawable.ic_home);
         ab.setTitle("MExpense");
         setHasOptionsMenu(true);

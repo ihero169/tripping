@@ -3,6 +3,7 @@ package com.example.mexpense.fragments.main.expense;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -115,7 +116,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                Navigation.findNavController(getView()).navigateUp();
+                Log.i("HOME", "onOptionsItemSelected: return home");
+                Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             case R.id.action_delete:
                 handleDelete();
