@@ -5,6 +5,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -21,9 +22,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -120,7 +123,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         editCost = binding.inputCost;
         editDate = binding.inputDate;
         editAmount = binding.inputAmount;
+
         buttonAddImage = binding.btnImage;
+        binding.previewIcon.setOnClickListener(this);
 
         Button saveButton = binding.btnSaveExpense;
         saveButton.setOnClickListener(this);
@@ -156,6 +161,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                         binding.inputTextComment.setText(expense.getComment());
 
                         if(!expense.getImage().equals("")){
+                            currentPhotoPath = expense.getImage();
                             buttonAddImage.setText("Change Image");
                             binding.previewIcon.setImageBitmap(Utilities.getImageFromURL(expense.getImage(), 52, 52));
                         } else {
@@ -245,6 +251,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             case R.id.btnImage:
                 setImage();
                 break;
+            case R.id.previewIcon:
+                viewPreview();
+                break;
             case R.id.inputDate:
                 setDate();
                 break;
@@ -253,6 +262,30 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             default:
                 break;
         }
+    }
+
+    private void viewPreview(){
+        Log.i("VIEW PREVIEW", "viewPreview: " + currentPhotoPath);
+        if(currentPhotoPath.equals("")) return;
+
+        Dialog dialog = new Dialog(getContext());
+        LayoutInflater inflater = getLayoutInflater();
+
+        View preview = (View) inflater.inflate(R.layout.image_preview, null);
+
+        dialog.setContentView(preview);
+
+        ImageView imageView = preview.findViewById(R.id.previewImageView);
+        imageView.setImageBitmap(Utilities.getImageFromURL(currentPhotoPath, 300, 400));
+
+        Button removeImage = preview.findViewById(R.id.btnRemoveCurrentImage);
+        removeImage.setOnClickListener(view -> {
+            currentPhotoPath = "";
+            binding.previewIcon.setImageResource(R.drawable.ic_camera);
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private void setImage() {
