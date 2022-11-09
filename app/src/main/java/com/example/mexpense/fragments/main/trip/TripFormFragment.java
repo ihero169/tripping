@@ -149,9 +149,9 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         setHasOptionsMenu(true);
 
         if (tripId == -1) {
-            ab.setTitle("New Trip");
+            ab.setTitle("Add Trip");
         } else {
-            ab.setTitle("Editing Trip " + tripId);
+            ab.setTitle("Editing Trip");
         }
 
 
@@ -184,10 +184,12 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         Trip t = mViewModel.trip.getValue();
         menu.findItem(R.id.action_reset).setVisible(false);
         menu.findItem(R.id.action_upload).setVisible(false);
-        if (t != null
-                && t.getId() == Constants.NEW_EXPENSE) {
-            menu.findItem(R.id.action_delete).setVisible(false);
+        if (t.getId() != Constants.NEW_EXPENSE) {
+            menu.findItem(R.id.action_delete).setVisible(true);
             menu.findItem(R.id.action_edit).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_delete).setVisible(false);
+            menu.findItem(R.id.action_edit).setVisible(false);
         }
     }
 
@@ -265,7 +267,8 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
 
         if (!editEndDate.getText().toString().equals("") && !editStartDate.getText().toString().equals("")) {
             if (!dateValidation(binding.inputStartDate.getText().toString(), binding.inputEndDate.getText().toString())) {
-                binding.layoutStartDate.setError("Start date must be before end date");
+                binding.layoutStartDate.setError("Start date must be");
+                binding.layoutEndDate.setError("before end date");
                 result = false;
             } else {
                 binding.layoutStartDate.setError(null);

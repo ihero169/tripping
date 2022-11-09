@@ -80,8 +80,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
     private boolean isOpen = false;
 
-    private HttpURLConnection con;
-
     public static TripMainFragment newInstance() {
         return new TripMainFragment();
     }
@@ -101,6 +99,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         mViewModel.tripList.observe(
                 getViewLifecycleOwner(),
                 trips -> {
+                    if(trips.size()==0){
+                        binding.txtNotifyEmptyTrip.setText("Please add some trips");
+                    }
                     adapter = new TripAdapter(trips, this);
                     binding.tripRecyclerView.setAdapter(adapter);
                     binding.tripRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
