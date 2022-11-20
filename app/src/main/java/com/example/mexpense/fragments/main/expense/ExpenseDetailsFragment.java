@@ -102,11 +102,7 @@ public class ExpenseDetailsFragment extends Fragment implements OnMapReadyCallba
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_trip_fragment, menu);
-        menu.findItem(R.id.action_delete).setVisible(true);
-        menu.findItem(R.id.action_edit).setVisible(true);
-        menu.findItem(R.id.action_reset).setVisible(false);
-        menu.findItem(R.id.action_upload).setVisible(false);
+        inflater.inflate(R.menu.edit_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

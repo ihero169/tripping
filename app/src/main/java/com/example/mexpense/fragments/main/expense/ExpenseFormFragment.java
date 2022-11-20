@@ -2,15 +2,11 @@
 package com.example.mexpense.fragments.main.expense;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,12 +18,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -57,7 +51,6 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class ExpenseFormFragment extends Fragment implements View.OnClickListener {
@@ -182,7 +175,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         ab.setHomeAsUpIndicator(R.drawable.ic_back);
 
         if(expenseId == Constants.NEW_EXPENSE){
-            ab.setTitle("Add Expense");
+            ab.setTitle("Adding New Expense");
         } else {
             ab.setTitle("Editing Expense");
         }
@@ -196,7 +189,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_trip_fragment, menu);
+        inflater.inflate(R.menu.edit_menu, menu);
+        if (expenseId != Constants.NEW_EXPENSE) {
+            menu.findItem(R.id.action_delete).setVisible(true);
+            menu.findItem(R.id.action_edit).setVisible(true);
+        } else {
+            menu.findItem(R.id.action_delete).setVisible(false);
+            menu.findItem(R.id.action_edit).setVisible(false);
+        }
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -222,9 +222,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
         Expense e = mViewModel.expense.getValue();
-        menu.findItem(R.id.action_reset).setVisible(false);
-        menu.findItem(R.id.action_edit).setVisible(false);
-        menu.findItem(R.id.action_upload).setVisible(false);
         if (e != null
                 && e.getId() == Constants.NEW_EXPENSE) {
             menu.findItem(R.id.action_delete).setVisible(false);
@@ -283,6 +280,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             currentPhotoPath = "";
             binding.previewIcon.setImageResource(R.drawable.ic_camera);
             dialog.dismiss();
+            Toast.makeText(getContext(), "Image removed", Toast.LENGTH_SHORT).show();
         });
 
         dialog.show();
@@ -302,6 +300,7 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             try {
                 openCamera();
             } catch (Exception e) {
+                Toast.makeText(getContext(), "Camera access must be allowed to capture image", Toast.LENGTH_SHORT).show();
                 ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
             }
         }
@@ -331,13 +330,11 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private File createImageFile() throws IOException {
-        @SuppressLint("SimpleDateFormat")
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
-        currentPhotoPath = image.getAbsolutePath();
-        return image;
+        String imageFileName = "JPEG_" +  expenseId;
+        File storage = getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File expenseImage = File.createTempFile(imageFileName, ".jpg", storage);
+        currentPhotoPath = expenseImage.getAbsolutePath();
+        return expenseImage;
     }
 
     @Override
@@ -349,7 +346,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         getContext().sendBroadcast(mediaScanIntent);
-
         if (!currentPhotoPath.equals("")) {
             buttonAddImage.setText("Change Image");
             binding.previewIcon.setImageBitmap(Utilities.getImageFromURL(currentPhotoPath, 52 , 52));
@@ -371,25 +367,31 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
                     service.deleteExpense(expenseId);
                     Bundle bundle = new Bundle();
                     bundle.putInt("tripId", tripId);
-
                     Utilities.hideInput(getActivity(), getView());
-                    // Close service;
                     locationService.removeService();
                     Utilities.hideInput(getActivity(), getView());
                     Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, bundle);
-
+                    Toast.makeText(getContext(), "Expense deleted", Toast.LENGTH_SHORT).show();
                 }).setNegativeButton("No", null).show();
     }
 
     private void handleSave() {
         if (validation()) {
+            String comment = binding.inputTextComment.getText().toString().equals("") ? "No comments" : binding.inputTextComment.getText().toString();
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation").setMessage("Are you sure?")
+                    .setTitle("Confirmation").setMessage("This expense will be added:\nCategory: "
+                            + editCategory.getText().toString() + "\nCost: $"
+                            + editCost.getText().toString() + "\nAmount: "
+                            + editAmount.getText().toString() + "\nDate: "
+                            + editDate.getText().toString() + "\nComment: "
+                            + comment + "\n")
                     .setPositiveButton("Yes", (arg0, arg1) -> {
                         if (expenseId == -1) {
                             service.addExpense(getFormInput());
+                            Toast.makeText(getContext(), "New Expense added", Toast.LENGTH_SHORT).show();
                         } else {
                             service.updateExpense(expenseId, getFormInput());
+                            Toast.makeText(getContext(), "Expense updated", Toast.LENGTH_SHORT).show();
                         }
                         // Close service;
                         locationService.removeService();
@@ -418,9 +420,15 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             if (!dateValidation(startDate, endDate, binding.inputDate.getText().toString())) {
                 dateLayout.setError("Expense date must be within " + startDate + " and " + endDate);
                 result = false;
-            } else {
-                dateLayout.setError(null);
             }
+        }
+
+        if(!binding.inputTextComment.getText().toString().equals("")){
+            if(!Utilities.onlyCharsAndSpace(binding.inputTextComment.getText().toString())){
+                binding.layoutComment.setError("Must not contain special characters");
+            }
+        } else {
+            binding.layoutComment.setError(null);
         }
 
         if (Integer.parseInt(editAmount.getText().toString()) == 0) {

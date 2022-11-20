@@ -17,6 +17,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -38,11 +39,13 @@ import com.example.mexpense.databinding.FragmentTripMainBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.entity.Trip;
 import com.example.mexpense.repository.ExpenseRepository;
+import com.example.mexpense.services.SqlService;
 import com.example.mexpense.services.TripService;
 import com.example.mexpense.ultilities.Constants;
 import com.example.mexpense.ultilities.Utilities;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -222,6 +225,12 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
 
             @Override
             public void afterTextChanged(Editable editable) {
+                if(!Utilities.onlyCharsAndSpace(editDestination.getText().toString())){
+                    if(!editDestination.getText().toString().equals("")){
+                        Toast.makeText(getContext(), "Only alphabet characters and space are allowed", Toast.LENGTH_SHORT).show();
+                    }
+                    return;
+                }
                 service.masterSearch(
                         mViewModel.tripList,
                         sortTripType.getText().toString(),
@@ -247,10 +256,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_trip_fragment, menu);
-        menu.findItem(R.id.action_delete).setVisible(false);
-        menu.findItem(R.id.action_edit).setVisible(false);
-        menu.findItem(R.id.action_reset).setVisible(true);
-        menu.findItem(R.id.action_upload).setVisible(true);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -372,6 +377,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
     private void uploadToCloud() {
         String url = getString(R.string.service_url);
         RequestQueue queue = Volley.newRequestQueue(getContext());
+        SqlService sqlService = new SqlService(getContext());
+        List<String> payload = sqlService.fetchPayload();
+
         StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, response -> {
             try {
                 JSONObject api_response = new JSONObject(response);
@@ -379,10 +387,8 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                 if(api_response.get("uploadResponseCode").equals("SUCCESS")){
                     new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_check_circle)
                             .setTitle("Data Uploaded to Cloud").setMessage(
-                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" +
-                                            "Uploaded " + api_response.get("number") + " entries for user: " + api_response.get("userid") + "\n" +
-                                            "Names: " + api_response.get("names") + "\n" +
-                                            "Message: " + api_response.get("message") + "\n"
+                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" + "Uploaded " + api_response.get("number") + " entries for user: "
+                                            + api_response.get("userid") + "\n" + "Names: " + api_response.get("names") + "\n" + "Message: " + api_response.get("message") + "\n"
                             ).setPositiveButton("Close", null).show();
                 } else {
                     new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_error)
@@ -397,24 +403,9 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
-                ExpenseRepository expenseRepository = new ExpenseRepository(getContext());
-                List<Expense> expenses = expenseRepository.getExpenses();
-                StringBuilder payload = new StringBuilder();
-
-                if (expenses != null && expenses.size() > 0) {
-                    for(int i = 0; i < expenses.size(); i++){
-                        payload.append(expenses.get(i).toJson());
-                        if(i<expenses.size()-1){
-                            payload.append(",");
-                        }
-                    }
-                }
-
-                params.put("jsonpayload", "{\"userId\":\"ht4872m\",\"detailList\":[" + payload + "]}");
-                Log.i("POST PARAMS", "getParams: " + params);
+                params.put("jsonpayload", "{\"userId\":\"ht4872m\",\"detailList\":" + payload + "}");
                 return params;
             }
-
             @Override
             public Map<String, String> getHeaders() {
                 HashMap<String, String> headers = new HashMap<>();
@@ -422,6 +413,13 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                 return headers;
             }
         };
-        queue.add(jsonObjReq);
+
+        if(payload.isEmpty()){
+            new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_error)
+                    .setTitle("No expenses to upload").setMessage(
+                            "There are no expenses to be uploaded, please add some!\n"
+                    ).setPositiveButton("Close", null).show();
+        }
+        else queue.add(jsonObjReq);
     }
 }

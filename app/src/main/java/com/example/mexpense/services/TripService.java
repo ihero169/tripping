@@ -1,6 +1,7 @@
 package com.example.mexpense.services;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -30,7 +31,6 @@ public class TripService {
         } else {
             t = repository.getTripById(id);
         }
-
         trip.setValue(t);
     }
 
@@ -60,13 +60,11 @@ public class TripService {
         } else {
             start = Utilities.convertDate(start, true);
         }
-
         if (end.equals("")) {
             end = Constants.LIMIT_END_DATE;
         } else {
             end = Utilities.convertDate(end, true);
         }
-
         trips.setValue(repository.masterSearch(name, destination, start, end));
     }
 }

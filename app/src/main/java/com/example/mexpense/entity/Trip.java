@@ -1,7 +1,12 @@
 package com.example.mexpense.entity;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import com.example.mexpense.ultilities.Constants;
 import com.google.gson.Gson;
+
+import java.util.Objects;
 
 public class Trip {
     private int id;
@@ -35,6 +40,31 @@ public class Trip {
         this.participants = participants;
         this.description = description;
         this.total = 0;
+    }
+
+    public Trip(Cursor c){
+        id = c.getInt(0);
+        name = c.getString(1);
+        destination = c.getString(2);
+        startDate = c.getString(3);
+        endDate = c.getString(4);
+        requiredAssessment = Objects.equals(c.getString(5), "1");
+        participants = Integer.parseInt(c.getString(6));
+        description = c.getString(7);
+        total = Double.parseDouble(c.getString(8));
+    }
+
+    public ContentValues toCV(){
+        ContentValues cv = new ContentValues();
+        cv.put(Constants.COLUMN_NAME_TRIP , getName());
+        cv.put(Constants.COLUMN_DESTINATION_TRIP , getDestination());
+        cv.put(Constants.COLUMN_START_DATE_TRIP , getStartDate());
+        cv.put(Constants.COLUMN_END_DATE_TRIP , getEndDate());
+        cv.put(Constants.COLUMN_REQUIRED_ASSESSMENT_TRIP , getRequiredAssessment() ? "1" : "0");
+        cv.put(Constants.COLUMN_PARTICIPANT_TRIP , getParticipants());
+        cv.put(Constants.COLUMN_DESCRIPTION_TRIP , getDescription());
+        cv.put(Constants.COLUMN_TOTAL_TRIP, getTotal());
+        return cv;
     }
 
     public Trip(int id, String name, String destination, String startDate, String endDate, boolean requiredAssessment, int participants, String description, Double total) {
@@ -136,13 +166,4 @@ public class Trip {
                 '}';
     }
 
-    public String toJson() {
-        Gson gson = new Gson();String json = gson.toJson(this);
-        return json;
-    }
-
-    public Trip fromJson(String json) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, Trip.class);
-    }
 }

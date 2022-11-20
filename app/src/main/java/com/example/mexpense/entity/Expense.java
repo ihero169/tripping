@@ -1,5 +1,8 @@
 package com.example.mexpense.entity;
 
+import android.content.ContentValues;
+import android.database.Cursor;
+
 import androidx.annotation.NonNull;
 
 import com.example.mexpense.ultilities.Constants;
@@ -42,15 +45,31 @@ public class Expense {
         imagePath = "";
     }
 
-    public String toJson() {
-        Gson gson = new Gson();
-        String json = gson.toJson(this);
-        return json;
+    public Expense(Cursor c){
+        setId(Integer.parseInt(c.getString(0)));
+        setCategory(c.getString(1));
+        setCost(Double.parseDouble(c.getString(2)));
+        setAmount(Integer.parseInt(c.getString(3)));
+        setDate(c.getString(4));
+        setComment(c.getString(5));
+        setTripId(Integer.parseInt(c.getString(6)));
+        setLatitude(Double.parseDouble(c.getString(7)));
+        setLongitude(Double.parseDouble(c.getString(8)));
+        setImage(c.getString(9));
     }
 
-    public Expense fromJson(String json) {
-        Gson gson = new Gson();
-        return gson.fromJson(json, Expense.class);
+    public ContentValues toCV(){
+        ContentValues cv = new ContentValues();
+        cv.put(Constants.COLUMN_CATEGORY_EXPENSE, getCategory());
+        cv.put(Constants.COLUMN_COST_EXPENSE, getCost());
+        cv.put(Constants.COLUMN_AMOUNT_EXPENSE, getAmount());
+        cv.put(Constants.COLUMN_DATE_EXPENSE, getDate());
+        cv.put(Constants.COLUMN_COMMENT_EXPENSE, getComment());
+        cv.put(Constants.COLUMN_TRIP_ID_EXPENSE, getTripId());
+        cv.put(Constants.COLUMN_LATITUDE_EXPENSE, getLatitude());
+        cv.put(Constants.COLUMN_LONGITUDE_EXPENSE, getLongitude());
+        cv.put(Constants.COLUMN_IMAGE_PATH_EXPENSE, getImage());
+        return cv;
     }
 
     @NonNull

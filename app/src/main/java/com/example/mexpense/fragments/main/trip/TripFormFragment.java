@@ -14,6 +14,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -131,7 +132,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                         binding.inputStartDate.setText(trip.getStartDate());
                         binding.inputEndDate.setText(trip.getEndDate());
                         binding.inputTextDestination.setText(trip.getDestination());
-                        binding.inputTextDescription.setText(trip.getDestination());
+                        binding.inputTextDescription.setText(trip.getDescription());
                         binding.inputTextParticipant.setText(String.valueOf(trip.getParticipants()));
                         binding.switchRequiredAssessment.setChecked(trip.getRequiredAssessment());
                     }
@@ -149,11 +150,10 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         setHasOptionsMenu(true);
 
         if (tripId == -1) {
-            ab.setTitle("Add Trip");
+            ab.setTitle("Adding New Trip");
         } else {
             ab.setTitle("Editing Trip");
         }
-
 
         requireActivity().invalidateOptionsMenu();
 
@@ -162,7 +162,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_trip_fragment, menu);
+        inflater.inflate(R.menu.edit_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -181,10 +181,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onPrepareOptionsMenu(@NonNull Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        Trip t = mViewModel.trip.getValue();
-        menu.findItem(R.id.action_reset).setVisible(false);
-        menu.findItem(R.id.action_upload).setVisible(false);
-        if (t.getId() != Constants.NEW_EXPENSE) {
+        if (tripId != Constants.NEW_EXPENSE) {
             menu.findItem(R.id.action_delete).setVisible(true);
             menu.findItem(R.id.action_edit).setVisible(true);
         } else {
@@ -232,39 +229,44 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                     .setPositiveButton("Yes", (arg0, arg1) -> {
                         if (tripId == -1) {
                             service.addTrip(getFormInput());
+                            Toast.makeText(getContext(), "New Trip added", Toast.LENGTH_SHORT).show();
+                            Utilities.hideInput(getActivity(), getView());
+                            Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                         } else {
                             service.updateTrip(tripId, getFormInput());
+                            Toast.makeText(getContext(), "Trip updated", Toast.LENGTH_SHORT).show();
+                            Utilities.hideInput(getActivity(), getView());
+                            Bundle b = new Bundle();
+                            b.putInt("tripId", tripId);
+                            Navigation.findNavController(getView()).navigate(R.id.expenseMainFragment, b);
                         }
-                        Utilities.hideInput(getActivity(), getView());
-                        Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                     }).setNegativeButton("No", null).show();
         }
     }
 
     private boolean validation() {
         boolean result = true;
-
         if (editDestination.getText().toString().equals("")) {
             binding.layoutDestination.setError("Please enter a destination");
+            result = false;
+        } else if(!Utilities.onlyCharsAndSpace(editDestination.getText().toString())) {
+            binding.layoutDestination.setError("Must not contain special characters");
             result = false;
         } else {
             binding.layoutDestination.setError(null);
         }
-
         if (editStartDate.getText().toString().equals("")) {
             binding.layoutStartDate.setError("Start date missing");
             result = false;
         } else {
             binding.layoutStartDate.setError(null);
         }
-
         if (editEndDate.getText().toString().equals("")) {
             binding.layoutEndDate.setError("End date missing");
             result = false;
         } else {
             binding.layoutEndDate.setError(null);
         }
-
         if (!editEndDate.getText().toString().equals("") && !editStartDate.getText().toString().equals("")) {
             if (!dateValidation(binding.inputStartDate.getText().toString(), binding.inputEndDate.getText().toString())) {
                 binding.layoutStartDate.setError("Start date must be");
@@ -274,14 +276,12 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                 binding.layoutStartDate.setError(null);
             }
         }
-
         if (Integer.parseInt(editParticipant.getText().toString()) == 0) {
             binding.layoutParticipants.setError("Please enter number of participants");
             result = false;
         } else {
             binding.layoutParticipants.setError(null);
         }
-
         return result;
     }
 

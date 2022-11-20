@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,7 +32,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class ExpenseMainFragment extends Fragment implements View.OnClickListener, ExpenseAdapter.ItemListener {
+public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.ItemListener {
 
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
@@ -82,13 +83,15 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                     binding.textRequiredAssessment.setText(trip.getRequiredAssessment() ? "Assessment Required " : "Assessment Not Required");
                 }
         );
-
         expenseService.getExpenses(mViewModel.expenseList, tripId);
         tripService.getTrip(mViewModel.trip, tripId);
         tripService.updateTotal(tripId, getTotal());
 
         FloatingActionButton btnAdd = binding.btnAddExpense;
-        btnAdd.setOnClickListener(this);
+        btnAdd.setOnClickListener(view -> {
+            Bundle bundle = getBundle(-1);
+            Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
+        });
 
         AppCompatActivity app = (AppCompatActivity)getActivity();
         ActionBar ab = app.getSupportActionBar();
@@ -104,11 +107,7 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater){
-        inflater.inflate(R.menu.menu_trip_fragment, menu);
-        menu.findItem(R.id.action_delete).setVisible(true);
-        menu.findItem(R.id.action_edit).setVisible(true);
-        menu.findItem(R.id.action_reset).setVisible(false);
-        menu.findItem(R.id.action_upload).setVisible(false);
+        inflater.inflate(R.menu.edit_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -130,24 +129,9 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnAddExpense:
-                addExpense();
-            default:
-                return;
-        }
-    }
-
-    @Override
     public void onItemClick(int expenseId) {
         Bundle bundle = getBundle(expenseId);
         Navigation.findNavController(getView()).navigate(R.id.expenseDetailsFragment, bundle);
-    }
-
-    public void addExpense() {
-        Bundle bundle = getBundle(-1);
-        Navigation.findNavController(getView()).navigate(R.id.expenseFormFragment, bundle);
     }
 
     public double getTotal() {
@@ -174,8 +158,8 @@ public class ExpenseMainFragment extends Fragment implements View.OnClickListene
                 .setTitle("Confirmation").setMessage("Are you sure?")
                 .setPositiveButton("Yes", (arg0, arg1) -> {
                     tripService.deleteTrip(tripId);
-                    Bundle bundle = new Bundle();
-                    Navigation.findNavController(getView()).navigate(R.id.tripMainFragment, bundle);
+                    Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
+                    Toast.makeText(getContext(), "Trip Deleted", Toast.LENGTH_SHORT).show();
                 }).setNegativeButton("No", null).show();
     }
 

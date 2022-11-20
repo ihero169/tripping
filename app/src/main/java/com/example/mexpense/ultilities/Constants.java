@@ -24,7 +24,7 @@ public class Constants {
     public static final String COLUMN_TOTAL_TRIP = "total";
 
     public static final String COLUMN_ID_EXPENSE = "expense_id";
-    public static final String COLUMN_CATEGORY_EXPENSE = "name"; // Required
+    public static final String COLUMN_CATEGORY_EXPENSE = "category"; // Required
     public static final String COLUMN_COST_EXPENSE = "cost"; // Required
     public static final String COLUMN_AMOUNT_EXPENSE = "amount";
     public static final String COLUMN_DATE_EXPENSE = "date"; // Required
