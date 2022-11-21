@@ -71,6 +71,8 @@ public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.Item
                     }
                 }
         );
+        tripService.getTrip(mViewModel.trip, tripId);
+        tripService.updateTotal(tripId, getTotal());
 
         mViewModel.trip.observe(
                 getViewLifecycleOwner(),
@@ -84,8 +86,6 @@ public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.Item
                 }
         );
         expenseService.getExpenses(mViewModel.expenseList, tripId);
-        tripService.getTrip(mViewModel.trip, tripId);
-        tripService.updateTotal(tripId, getTotal());
 
         FloatingActionButton btnAdd = binding.btnAddExpense;
         btnAdd.setOnClickListener(view -> {

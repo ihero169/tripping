@@ -88,7 +88,8 @@ public class TripRepository {
         if(!isFirst){
             query += " AND ";
         }
-        query += Constants.COLUMN_START_DATE_TRIP  + " >= '" + start + "' AND " + Constants.COLUMN_END_DATE_TRIP  + " <= '" + end + "'";
+        query += Constants.COLUMN_START_DATE_TRIP  + " >= '" + start + "' AND "
+                + Constants.COLUMN_END_DATE_TRIP  + " <= '" + end + "'";
         Cursor c = db.rawQuery(query, null);
         return getList(c);
     }

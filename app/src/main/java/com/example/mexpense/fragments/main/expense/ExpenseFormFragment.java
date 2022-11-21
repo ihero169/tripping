@@ -377,7 +377,9 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private void handleSave() {
         if (validation()) {
-            String comment = binding.inputTextComment.getText().toString().equals("") ? "No comments" : binding.inputTextComment.getText().toString();
+            String comment = binding.inputTextComment.getText().toString().equals("")
+                    ? "No comments"
+                    : binding.inputTextComment.getText().toString();
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
                     .setTitle("Confirmation").setMessage("This expense will be added:\nCategory: "
                             + editCategory.getText().toString() + "\nCost: $"
@@ -453,7 +455,10 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         LocalDate startDate = LocalDate.parse(startStr, sql);
         LocalDate endDate = LocalDate.parse(endStr, sql);
         LocalDate expenseDate = LocalDate.parse(expenseStr, sql);
-        return expenseDate.isAfter(startDate) && expenseDate.isBefore(endDate) || expenseDate.isEqual(startDate) || expenseDate.isEqual(endDate);
+        return expenseDate.isAfter(startDate)
+                && expenseDate.isBefore(endDate)
+                || expenseDate.isEqual(startDate)
+                || expenseDate.isEqual(endDate);
     }
 
     private Expense getFormInput() {

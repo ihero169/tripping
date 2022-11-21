@@ -227,7 +227,8 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             public void afterTextChanged(Editable editable) {
                 if(!Utilities.onlyCharsAndSpace(editDestination.getText().toString())){
                     if(!editDestination.getText().toString().equals("")){
-                        Toast.makeText(getContext(), "Only alphabet characters and space are allowed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), "Only alphabet characters and space are allowed",
+                                Toast.LENGTH_SHORT).show();
                     }
                     return;
                 }
@@ -387,13 +388,16 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                 if(api_response.get("uploadResponseCode").equals("SUCCESS")){
                     new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_check_circle)
                             .setTitle("Data Uploaded to Cloud").setMessage(
-                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" + "Uploaded " + api_response.get("number") + " entries for user: "
-                                            + api_response.get("userid") + "\n" + "Names: " + api_response.get("names") + "\n" + "Message: " + api_response.get("message") + "\n"
+                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n"
+                                            + "Uploaded " + api_response.get("number") + " entries for user: "
+                                            + api_response.get("userid") + "\n" + "Names: "
+                                            + api_response.get("names") + "\n" + "Message: " + api_response.get("message") + "\n"
                             ).setPositiveButton("Close", null).show();
                 } else {
                     new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_error)
                             .setTitle("Error Uploading Data to Cloud").setMessage(
-                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n" + "Message: " + api_response.get("message") + "\n"
+                                    "Response Code: " + api_response.get("uploadResponseCode") + "\n"
+                                            + "Message: " + api_response.get("message") + "\n"
                             ).setPositiveButton("Close", null).show();
                 }
             } catch (JSONException e) {

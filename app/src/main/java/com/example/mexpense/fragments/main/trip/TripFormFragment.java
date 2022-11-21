@@ -225,7 +225,11 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         if (validation()) {
             String assessmentRequired = assessment.isChecked() ? "Assessment Required" : "Assessment Not Required";
             new AlertDialog.Builder(getContext()).setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle("Confirmation").setMessage("Are you sure?" + "\nTrip Type: " + editTripType.getText().toString() + "\nDestination: " + editDestination.getText().toString() + "\nFrom " + editStartDate.getText().toString() + " to " + editEndDate.getText().toString() + "\nParticipants: " + Integer.parseInt(editParticipant.getText().toString()) + "\n" + assessmentRequired + "\nOther notes: " + editDescription.getText().toString())
+                    .setTitle("Confirmation").setMessage("Are you sure?" + "\nTrip Type: " + editTripType.getText().toString()
+                            + "\nDestination: " + editDestination.getText().toString() + "\nFrom "
+                            + editStartDate.getText().toString() + " to " + editEndDate.getText().toString()
+                            + "\nParticipants: " + Integer.parseInt(editParticipant.getText().toString())
+                            + "\n" + assessmentRequired + "\nOther notes: " + editDescription.getText().toString())
                     .setPositiveButton("Yes", (arg0, arg1) -> {
                         if (tripId == -1) {
                             service.addTrip(getFormInput());
