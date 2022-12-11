@@ -202,7 +202,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             @Override
             public void afterTextChanged(Editable editable) {
                 String type = sortTripType.getText().toString();
-                Log.i("Search", "Keyword: " + type);
                 service.masterSearch(
                         mViewModel.tripList,
                         sortTripType.getText().toString(),
@@ -227,7 +226,7 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
             public void afterTextChanged(Editable editable) {
                 if(!Utilities.onlyCharsAndSpace(editDestination.getText().toString())){
                     if(!editDestination.getText().toString().equals("")){
-                        Toast.makeText(getContext(), "Only alphabet characters and space are allowed",
+                        Toast.makeText(getContext(), Constants.CHARACTERS_ONLY_MESSAGE,
                                 Toast.LENGTH_SHORT).show();
                     }
                     return;
@@ -349,7 +348,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
                     service.resetDatabase();
                     List<Trip> newList = new ArrayList<>();
                     mViewModel.tripList.setValue(newList);
-                    Log.i("Database", "Database wiped");
                 }).setNegativeButton("No", null).show();
     }
 
@@ -384,7 +382,6 @@ public class TripMainFragment extends Fragment implements View.OnClickListener, 
         StringRequest jsonObjReq = new StringRequest(Request.Method.POST, url, response -> {
             try {
                 JSONObject api_response = new JSONObject(response);
-                Log.i("RESPONSE", "uploadToCloud: " + api_response);
                 if(api_response.get("uploadResponseCode").equals("SUCCESS")){
                     new AlertDialog.Builder(getContext()).setIcon(R.drawable.ic_check_circle)
                             .setTitle("Data Uploaded to Cloud").setMessage(

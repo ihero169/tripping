@@ -212,6 +212,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                 new DatePickerDialog(getContext(), endDate, myCalendar.get(Calendar.YEAR), myCalendar.get(Calendar.MONTH), myCalendar.get(Calendar.DAY_OF_MONTH)).show();
                 break;
             case R.id.inputTextTripType:
+                Utilities.hideInput(getActivity(), getView());
                 getTrips();
                 return;
             case R.id.btnSaveTrip:
@@ -251,26 +252,29 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
     private boolean validation() {
         boolean result = true;
         if (editDestination.getText().toString().equals("")) {
-            binding.layoutDestination.setError("Please enter a destination");
+            binding.layoutDestination.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else if(!Utilities.onlyCharsAndSpace(editDestination.getText().toString())) {
-            binding.layoutDestination.setError("Must not contain special characters");
+            binding.layoutDestination.setError(Constants.CHARACTERS_ONLY_MESSAGE);
             result = false;
         } else {
             binding.layoutDestination.setError(null);
         }
+
         if (editStartDate.getText().toString().equals("")) {
-            binding.layoutStartDate.setError("Start date missing");
+            binding.layoutStartDate.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             binding.layoutStartDate.setError(null);
         }
+
         if (editEndDate.getText().toString().equals("")) {
-            binding.layoutEndDate.setError("End date missing");
+            binding.layoutEndDate.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             binding.layoutEndDate.setError(null);
         }
+
         if (!editEndDate.getText().toString().equals("") && !editStartDate.getText().toString().equals("")) {
             if (!dateValidation(binding.inputStartDate.getText().toString(), binding.inputEndDate.getText().toString())) {
                 binding.layoutStartDate.setError("Start date must be");
@@ -280,12 +284,23 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
                 binding.layoutStartDate.setError(null);
             }
         }
+
         if (Integer.parseInt(editParticipant.getText().toString()) == 0) {
-            binding.layoutParticipants.setError("Please enter number of participants");
+            binding.layoutParticipants.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             binding.layoutParticipants.setError(null);
         }
+
+        if(!binding.inputTextDescription.getText().toString().equals("")){
+            if (!Utilities.onlyCharsAndSpace(binding.inputTextDescription.getText().toString())) {
+                binding.layoutDescription.setError(Constants.CHARACTERS_ONLY_MESSAGE);
+                result = false;
+            } else {
+                binding.layoutDescription.setError(null);
+            }
+        }
+
         return result;
     }
 
@@ -313,6 +328,7 @@ public class TripFormFragment extends Fragment implements View.OnClickListener {
         dateView.setText(dateFormat.format(myCalendar.getTime()));
     }
 
+    // Reference: https://developer.android.com/reference/android/widget/AutoCompleteTextView
     private void getTrips() {
         ArrayAdapter adapter = new ArrayAdapter(getContext(), R.layout.dropdown_item, Constants.trips);
         editTripType.setAdapter(adapter);

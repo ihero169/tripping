@@ -35,4 +35,8 @@ public class Constants {
     public static final String COLUMN_IMAGE_PATH_EXPENSE = "image";
 
     public static final String EXPENSE_TABLE_NAME = "expenses_table";
+
+    public static final String CHARACTERS_ONLY_MESSAGE = "Must not contain special characters";
+
+    public static final String EMPTY_FIELD_MESSAGE = "Please fill this field";
 }

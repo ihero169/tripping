@@ -262,7 +262,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     }
 
     private void viewPreview(){
-        Log.i("VIEW PREVIEW", "viewPreview: " + currentPhotoPath);
         if(currentPhotoPath.equals("")) return;
 
         Dialog dialog = new Dialog(getContext());
@@ -288,7 +287,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
     private void setImage() {
         int MY_PERMISSIONS_REQUEST_CAMERA = 0;
-        Log.i("CAMERA ACCESS", "setImage");
         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
@@ -317,11 +315,8 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
             Log.i("FILE ERROR", ex.toString());
         }
 
-        Log.i("FILE CREATION", "FILE CREATED ");
-
         Uri photoURI = FileProvider.getUriForFile(getContext(), "com.example.android.fileprovider", photoFile);
         cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-        Log.i("FILE CREATION", "URI: " + photoURI.toString());
         startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
     }
 
@@ -341,7 +336,6 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        Log.i("CAMERA", "IMAGE TAKEN");
         File f = new File(currentPhotoPath);
         contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
@@ -409,14 +403,14 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
         String endDate = getArguments().getString("endDate");
 
         if (editAmount.getText().toString().equals("")) {
-            binding.textInputLayoutAmount.setError("Please enter the amount");
+            binding.textInputLayoutAmount.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             categoryLayout.setError(null);
         }
 
         if (editDate.getText().toString().equals("")) {
-            dateLayout.setError("Please select a date");
+            dateLayout.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             if (!dateValidation(startDate, endDate, binding.inputDate.getText().toString())) {
@@ -427,21 +421,21 @@ public class ExpenseFormFragment extends Fragment implements View.OnClickListene
 
         if(!binding.inputTextComment.getText().toString().equals("")){
             if(!Utilities.onlyCharsAndSpace(binding.inputTextComment.getText().toString())){
-                binding.layoutComment.setError("Must not contain special characters");
+                binding.layoutComment.setError(Constants.CHARACTERS_ONLY_MESSAGE);
             }
         } else {
             binding.layoutComment.setError(null);
         }
 
         if (Integer.parseInt(editAmount.getText().toString()) == 0) {
-            amountLayout.setError("Please enter an amount");
+            amountLayout.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             amountLayout.setError(null);
         }
 
         if (Float.parseFloat(editCost.getText().toString()) == 0.0) {
-            costLayout.setError("Please enter a cost");
+            costLayout.setError(Constants.EMPTY_FIELD_MESSAGE);
             result = false;
         } else {
             costLayout.setError(null);

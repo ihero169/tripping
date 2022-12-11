@@ -115,7 +115,6 @@ public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.Item
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                Log.i("HOME", "onOptionsItemSelected: return home");
                 Navigation.findNavController(getView()).navigate(R.id.tripMainFragment);
                 return true;
             case R.id.action_delete:
