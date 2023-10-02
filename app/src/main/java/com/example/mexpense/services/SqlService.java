@@ -19,6 +19,7 @@ public class SqlService extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "mExpense";
     public static final String TRIPS_TABLE_NAME = "trips_table";
     public static final String EXPENSE_TABLE_NAME = "expenses_table";
+    public static final String USER_TABLE_NAME = "user_table";
 
     private SQLiteDatabase database;
 
@@ -67,11 +68,19 @@ public class SqlService extends SQLiteOpenHelper {
             EXPENSE_TABLE_NAME, Constants.COLUMN_ID_EXPENSE, Constants.COLUMN_CATEGORY_EXPENSE, Constants.COLUMN_COST_EXPENSE, Constants.COLUMN_AMOUNT_EXPENSE, Constants.COLUMN_DATE_EXPENSE, Constants.COLUMN_COMMENT_EXPENSE, Constants.COLUMN_TRIP_ID_EXPENSE, Constants.COLUMN_LATITUDE_EXPENSE, Constants.COLUMN_LONGITUDE_EXPENSE, Constants.COLUMN_IMAGE_PATH_EXPENSE
     );
 
+    private static final String USER_DATABASE_CREATE = String.format(
+            "CREATE TABLE %s (" +
+                    " %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    " %s TEXT, " +
+                    " %s REAL)",
+            USER_TABLE_NAME, Constants.COLUMN_ID_USER, Constants.COLUMN_USERNAME_USER, Constants.COLUMN_PASSWORD_USER);
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         this.database = sqLiteDatabase;
         database.execSQL(TRIP_DATABASE_CREATE);
         database.execSQL(EXPENSE_DATABASE_CREATE);
+        database.execSQL(USER_DATABASE_CREATE);
     }
 
     @Override
@@ -79,6 +88,7 @@ public class SqlService extends SQLiteOpenHelper {
         try{
             database.execSQL("DROP TABLE IF EXISTS " + EXPENSE_TABLE_NAME);
             database.execSQL("DROP TABLE IF EXISTS " + TRIPS_TABLE_NAME);
+            database.execSQL("DROP TABLE IF EXISTS " + USER_TABLE_NAME);
         }
         catch (Exception e){
             Log.i("SQLITE DATABASE", "onUpgrade: " + e);
