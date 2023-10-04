@@ -3,8 +3,8 @@ package com.example.upbrain.shared.widget.calendar.view.internal.weekcalendar
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.upbrain.shared.widget.calendar.core.Week
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
+import com.example.mexpense.widget.calendar.core.Week
+import com.example.mexpense.widget.calendar.core.WeekDay
 import com.example.upbrain.shared.widget.calendar.view.ViewContainer
 import com.example.upbrain.shared.widget.calendar.view.WeekHeaderFooterBinder
 import com.example.upbrain.shared.widget.calendar.view.internal.WeekHolder

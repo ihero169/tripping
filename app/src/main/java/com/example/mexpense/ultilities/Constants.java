@@ -33,13 +33,14 @@ public class Constants {
     public static final String COLUMN_LATITUDE_EXPENSE = "latitude";
     public static final String COLUMN_LONGITUDE_EXPENSE = "longitude";
     public static final String COLUMN_IMAGE_PATH_EXPENSE = "image";
-    public static final String COLUMN_ID_USER = "user_id";
-    public static final String COLUMN_USERNAME_USER = "user";
-    public static final String COLUMN_PASSWORD_USER = "password";
-
     public static final String EXPENSE_TABLE_NAME = "expenses_table";
 
     public static final String CHARACTERS_ONLY_MESSAGE = "Must not contain special characters";
 
     public static final String EMPTY_FIELD_MESSAGE = "Please fill this field";
+    //user
+    public static final String COLUMN_USER_ID = "user_id";
+    public static final String COLUMN_USER_NAME = "user_name";
+    public static final String COLUMN_USER_EMAIL = "user_email";
+    public static final String COLUMN_USER_PASSWORD = "user_password";
 }

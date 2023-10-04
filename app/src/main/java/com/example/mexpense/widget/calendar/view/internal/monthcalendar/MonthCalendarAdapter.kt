@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.RecyclerView
-import com.example.upbrain.shared.widget.calendar.core.CalendarDay
-import com.example.upbrain.shared.widget.calendar.core.CalendarMonth
-import com.example.upbrain.shared.widget.calendar.core.DayPosition
-import com.example.upbrain.shared.widget.calendar.core.OutDateStyle
+import com.example.mexpense.widget.calendar.core.CalendarDay
+import com.example.mexpense.widget.calendar.core.CalendarMonth
+import com.example.mexpense.widget.calendar.core.DayPosition
+import com.example.mexpense.widget.calendar.core.OutDateStyle
 import com.example.upbrain.shared.widget.calendar.core.nextMonth
 import com.example.upbrain.shared.widget.calendar.core.previousMonth
 import com.example.upbrain.shared.widget.calendar.core.yearMonth
@@ -17,7 +17,7 @@ import com.example.upbrain.shared.widget.calendar.data.DataStore
 import com.example.upbrain.shared.widget.calendar.data.getCalendarMonthData
 import com.example.upbrain.shared.widget.calendar.data.getMonthIndex
 import com.example.upbrain.shared.widget.calendar.data.getMonthIndicesCount
-import com.example.upbrain.shared.widget.calendar.view.CalendarView
+import com.example.mexpense.widget.calendar.view.CalendarView
 import com.example.upbrain.shared.widget.calendar.view.MonthDayBinder
 import com.example.upbrain.shared.widget.calendar.view.MonthHeaderFooterBinder
 import com.example.upbrain.shared.widget.calendar.view.ViewContainer

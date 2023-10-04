@@ -1,11 +1,11 @@
-package com.example.upbrain.shared.exts
+package com.example.mexpense.exts
 
 import android.annotation.SuppressLint
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
-import com.example.upbrain.shared.utils.ColorUtils
 import com.google.android.material.button.MaterialButton
 
 fun View.setOnDelayClickListener(method: () -> Unit) {
@@ -44,5 +44,15 @@ fun View.changeVisibility(isVisible: Boolean) {
         this.visibility = View.VISIBLE
     } else {
         this.visibility = View.GONE
+    }
+}
+
+
+object ColorUtils {
+    fun getColorFromHex(hex: String): Int {
+        return when {
+            hex.contains("#") -> Color.parseColor(hex)
+            else -> Color.parseColor("#$hex")
+        }
     }
 }

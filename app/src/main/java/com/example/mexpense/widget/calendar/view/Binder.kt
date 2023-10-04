@@ -1,10 +1,10 @@
 package com.example.upbrain.shared.widget.calendar.view
 
 import android.view.View
-import com.example.upbrain.shared.widget.calendar.core.CalendarDay
-import com.example.upbrain.shared.widget.calendar.core.CalendarMonth
-import com.example.upbrain.shared.widget.calendar.core.Week
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
+import com.example.mexpense.widget.calendar.core.CalendarDay
+import com.example.mexpense.widget.calendar.core.CalendarMonth
+import com.example.mexpense.widget.calendar.core.Week
+import com.example.mexpense.widget.calendar.core.WeekDay
 
 open class ViewContainer(val view: View)
 

@@ -1,4 +1,4 @@
-package com.example.upbrain.shared.widget
+package com.example.mexpense.widget
 
 import android.app.Dialog
 import android.content.Context
@@ -7,7 +7,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.Window
 import android.view.WindowManager
-import com.example.upbrain.R
+import com.example.mexpense.R
 
 class LoadingDialog(context: Context) : Dialog(context) {
     override fun onCreate(savedInstanceState: Bundle?) {

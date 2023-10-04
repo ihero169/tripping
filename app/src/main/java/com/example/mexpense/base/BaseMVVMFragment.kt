@@ -25,8 +25,6 @@ abstract class BaseMVVMFragment<V : ViewBinding, VM : BaseViewModel> : BaseFragm
      * @return binding - call view on screen
      */
     private lateinit var viewBinding: V
-    protected lateinit var navControl: NavController
-
     protected fun getViewBinding(): V {
         return viewBinding
     }
@@ -87,8 +85,6 @@ abstract class BaseMVVMFragment<V : ViewBinding, VM : BaseViewModel> : BaseFragm
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(getViewModelProviderOwner())[getViewModelClass()]
         viewModel.isPopBackStack = false
-        val navHostFragment = (activity as BaseActivity).supportFragmentManager.findFragmentById(R.id.nav_graph) as NavHostFragment
-        navControl = navHostFragment.navController
     }
 
     override fun onCreateView(

@@ -1,8 +1,8 @@
-package com.example.upbrain.shared.widget.calendar.core
+package com.example.mexpense.widget.calendar.core
 
 import java.io.Serializable
 import java.time.YearMonth
-import javax.annotation.concurrent.Immutable
+
 
 /**
  * Represents a month on the calendar.
@@ -10,7 +10,6 @@ import javax.annotation.concurrent.Immutable
  * @param yearMonth the calendar month value.
  * @param weekDays the weeks in this month.
  */
-@Immutable
 data class CalendarMonth(
     val yearMonth: YearMonth,
     val weekDays: List<List<CalendarDay>>,

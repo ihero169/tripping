@@ -10,12 +10,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
@@ -24,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mexpense.R;
 import com.example.mexpense.adapters.ExpenseAdapter;
+import com.example.mexpense.base.BaseActivity;
 import com.example.mexpense.databinding.FragmentExpenseMainBinding;
 import com.example.mexpense.entity.Expense;
 import com.example.mexpense.services.ExpenseService;
@@ -37,6 +41,7 @@ public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.Item
     private ExpenseMainViewModel mViewModel;
     private FragmentExpenseMainBinding binding;
     private ExpenseAdapter adapter;
+    private ImageButton btnLogout;
     private TripService tripService;
     private int tripId;
 
@@ -50,6 +55,18 @@ public class ExpenseMainFragment extends Fragment implements ExpenseAdapter.Item
                              @Nullable Bundle savedInstanceState) {
         mViewModel = new ViewModelProvider(this).get(ExpenseMainViewModel.class);
         binding = FragmentExpenseMainBinding.inflate(inflater, container, false);
+        final BaseActivity act = (BaseActivity) getActivity();
+//        if (act.getSupportActionBar() != null) {
+//            ConstraintLayout toolbar = (ConstraintLayout) act.getSupportActionBar().getCustomView();
+//            act.getSupportActionBar().show();
+//           btnLogout = toolbar.findViewById(R.id.btnLogout);
+//           btnLogout.setOnClickListener(new View.OnClickListener() {
+//               @Override
+//               public void onClick(View view) {
+//                   Navigation.findNavController(view).navigate(ExpenseMainFragmentDirections.actionExpenseMainFragmentToLoginFragment());
+//               }
+//           });
+//        }
         tripService = new TripService(getContext());
         ExpenseService expenseService = new ExpenseService(getContext());
 

@@ -5,8 +5,8 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.example.upbrain.shared.widget.calendar.core.Week
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
+import com.example.mexpense.widget.calendar.core.Week
+import com.example.mexpense.widget.calendar.core.WeekDay
 import com.example.upbrain.shared.widget.calendar.data.DataStore
 import com.example.upbrain.shared.widget.calendar.data.getWeekCalendarAdjustedRange
 import com.example.upbrain.shared.widget.calendar.data.getWeekCalendarData

@@ -1,4 +1,4 @@
-package com.example.upbrain.shared.widget.calendar.core
+package com.example.mexpense.widget.calendar.core
 
 /**
  * Describes the position of a [WeekDay] on the calendar.

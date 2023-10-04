@@ -5,8 +5,8 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.LinearLayout
 import androidx.annotation.LayoutRes
-import com.example.upbrain.shared.widget.calendar.core.CalendarDay
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
+import com.example.mexpense.widget.calendar.core.CalendarDay
+import com.example.mexpense.widget.calendar.core.WeekDay
 import com.example.upbrain.shared.widget.calendar.view.Binder
 import com.example.upbrain.shared.widget.calendar.view.DaySize
 import com.example.upbrain.shared.widget.calendar.view.ViewContainer

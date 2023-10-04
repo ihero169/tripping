@@ -5,9 +5,9 @@ import android.util.AttributeSet
 import android.view.ViewGroup
 import androidx.core.content.withStyledAttributes
 import androidx.recyclerview.widget.RecyclerView
-import com.example.upbrain.R
-import com.example.upbrain.shared.widget.calendar.core.Week
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
+import com.example.mexpense.R
+import com.example.mexpense.widget.calendar.core.Week
+import com.example.mexpense.widget.calendar.core.WeekDay
 import com.example.upbrain.shared.widget.calendar.data.checkDateRange
 import com.example.upbrain.shared.widget.calendar.view.internal.CalendarPageSnapHelper
 import com.example.upbrain.shared.widget.calendar.view.internal.weekcalendar.WeekCalendarAdapter

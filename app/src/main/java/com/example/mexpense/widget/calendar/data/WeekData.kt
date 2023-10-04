@@ -1,8 +1,8 @@
 package com.example.upbrain.shared.widget.calendar.data
 
-import com.example.upbrain.shared.widget.calendar.core.Week
-import com.example.upbrain.shared.widget.calendar.core.WeekDay
-import com.example.upbrain.shared.widget.calendar.core.WeekDayPosition
+import com.example.mexpense.widget.calendar.core.Week
+import com.example.mexpense.widget.calendar.core.WeekDay
+import com.example.mexpense.widget.calendar.core.WeekDayPosition
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit

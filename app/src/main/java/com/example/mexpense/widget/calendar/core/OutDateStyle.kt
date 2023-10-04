@@ -1,4 +1,4 @@
-package com.example.upbrain.shared.widget.calendar.core
+package com.example.mexpense.widget.calendar.core
 
 /**
  * Determines how [DayPosition.OutDate] are

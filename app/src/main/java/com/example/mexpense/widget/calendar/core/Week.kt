@@ -1,14 +1,12 @@
-package com.example.upbrain.shared.widget.calendar.core
+package com.example.mexpense.widget.calendar.core
 
 import java.io.Serializable
-import javax.annotation.concurrent.Immutable
 
 /**
  * Represents a week on the week-based calendar.
  *
  * @param days the days in this week.
  */
-@Immutable
 data class Week(val days: List<WeekDay>) : Serializable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

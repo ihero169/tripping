@@ -6,7 +6,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.example.upbrain.shared.widget.LoadingDialog
+import com.example.mexpense.widget.LoadingDialog
 
 abstract class BaseActivity : AppCompatActivity() {
     private val loadingDialog by lazy { LoadingDialog(this) }

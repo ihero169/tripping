@@ -1,8 +1,8 @@
-package com.example.upbrain.shared.widget.calendar.core
+package com.example.mexpense.widget.calendar.core
 
 import java.io.Serializable
 import java.time.LocalDate
-import javax.annotation.concurrent.Immutable
+
 
 /**
  * Represents a day on the week calendar.
@@ -10,5 +10,4 @@ import javax.annotation.concurrent.Immutable
  * @param date the date for this day.
  * @param position the [WeekDayPosition] for this day.
  */
-@Immutable
 data class WeekDay(val date: LocalDate, val position: WeekDayPosition) : Serializable

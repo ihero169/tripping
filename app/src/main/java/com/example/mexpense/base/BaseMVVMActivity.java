@@ -6,7 +6,6 @@ import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
-import com.example.upbrain.presentation.base.BaseViewModel;
 
 /**
  * The type Base mvvm activity.
