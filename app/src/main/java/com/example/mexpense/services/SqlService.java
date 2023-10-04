@@ -68,6 +68,35 @@ public class SqlService extends SQLiteOpenHelper {
             EXPENSE_TABLE_NAME, Constants.COLUMN_ID_EXPENSE, Constants.COLUMN_CATEGORY_EXPENSE, Constants.COLUMN_COST_EXPENSE, Constants.COLUMN_AMOUNT_EXPENSE, Constants.COLUMN_DATE_EXPENSE, Constants.COLUMN_COMMENT_EXPENSE, Constants.COLUMN_TRIP_ID_EXPENSE, Constants.COLUMN_LATITUDE_EXPENSE, Constants.COLUMN_LONGITUDE_EXPENSE, Constants.COLUMN_IMAGE_PATH_EXPENSE
     );
 
+    public Boolean insertData(String username, String password){
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        ContentValues contentValues= new ContentValues();
+        contentValues.put("username", username);
+        contentValues.put("password", password);
+        long result = MyDB.insert("users", null, contentValues);
+        if(result==-1) return false;
+        else
+            return true;
+    }
+
+    public Boolean checkusername(String username) {
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        Cursor cursor = MyDB.rawQuery("Select * from users where username = ?", new String[]{username});
+        if (cursor.getCount() > 0)
+            return true;
+        else
+            return false;
+    }
+
+    public Boolean checkusernamepassword(String username, String password){
+        SQLiteDatabase MyDB = this.getWritableDatabase();
+        Cursor cursor = MyDB.rawQuery("Select * from users where username = ? and password = ?", new String[] {username,password});
+        if(cursor.getCount()>0)
+            return true;
+        else
+            return false;
+    }
+
     private static final String USER_DATABASE_CREATE = String.format(
             "CREATE TABLE %s (" +
                     " %s INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -80,7 +109,7 @@ public class SqlService extends SQLiteOpenHelper {
         this.database = sqLiteDatabase;
         database.execSQL(TRIP_DATABASE_CREATE);
         database.execSQL(EXPENSE_DATABASE_CREATE);
-        database.execSQL(USER_DATABASE_CREATE);
+        database.execSQL("create Table users(username TEXT primary key, password TEXT)");
     }
 
     @Override
