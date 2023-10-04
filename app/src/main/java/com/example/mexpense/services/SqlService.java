@@ -1,6 +1,8 @@
 package com.example.mexpense.services;
 
 
+import static com.example.mexpense.ultilities.Constants.COLUMN_CATEGORY_ID;
+import static com.example.mexpense.ultilities.Constants.COLUMN_CATEGORY_NAME;
 import static com.example.mexpense.ultilities.Constants.COLUMN_USER_EMAIL;
 import static com.example.mexpense.ultilities.Constants.COLUMN_USER_ID;
 import static com.example.mexpense.ultilities.Constants.COLUMN_USER_NAME;
@@ -28,6 +30,7 @@ public class SqlService extends SQLiteOpenHelper {
     public static final String TRIPS_TABLE_NAME = "trips_table";
     public static final String EXPENSE_TABLE_NAME = "expenses_table";
     public static final String TABLE_USER = "user_table";
+    public static final String TABLE_CATEGORY = "category_table";
 
     private SQLiteDatabase database;
 
@@ -43,7 +46,7 @@ public class SqlService extends SQLiteOpenHelper {
     }
 
     public SqlService(@Nullable Context context) {
-        super(context, DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 2);
         database = getWritableDatabase();
     }
 
@@ -76,11 +79,16 @@ public class SqlService extends SQLiteOpenHelper {
             EXPENSE_TABLE_NAME, Constants.COLUMN_ID_EXPENSE, Constants.COLUMN_CATEGORY_EXPENSE, Constants.COLUMN_COST_EXPENSE, Constants.COLUMN_AMOUNT_EXPENSE, Constants.COLUMN_DATE_EXPENSE, Constants.COLUMN_COMMENT_EXPENSE, Constants.COLUMN_TRIP_ID_EXPENSE, Constants.COLUMN_LATITUDE_EXPENSE, Constants.COLUMN_LONGITUDE_EXPENSE, Constants.COLUMN_IMAGE_PATH_EXPENSE
     );
 
-    private String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + "("
+    private static final String CREATE_USER_TABLE = "CREATE TABLE " + TABLE_USER + "("
             + COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_USER_NAME + " TEXT,"
             + COLUMN_USER_EMAIL + " TEXT," + COLUMN_USER_PASSWORD + " TEXT" + ")";
     // drop table sql query
-    private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
+    private static final String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + TABLE_USER;
+
+    private static final String CREATE_CATEGORY_TABLE = "CREATE TABLE " + TABLE_CATEGORY + "("
+            + COLUMN_CATEGORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COLUMN_CATEGORY_NAME + " TEXT" + ")";
+    // drop table sql query
+    private static final String DROP_CATEGORY_TABLE = "DROP TABLE IF EXISTS " + TABLE_CATEGORY;
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -88,6 +96,7 @@ public class SqlService extends SQLiteOpenHelper {
         database.execSQL(TRIP_DATABASE_CREATE);
         database.execSQL(EXPENSE_DATABASE_CREATE);
         database.execSQL(CREATE_USER_TABLE);
+        database.execSQL(CREATE_CATEGORY_TABLE);
     }
 
     @Override
@@ -96,6 +105,7 @@ public class SqlService extends SQLiteOpenHelper {
             database.execSQL("DROP TABLE IF EXISTS " + EXPENSE_TABLE_NAME);
             database.execSQL("DROP TABLE IF EXISTS " + TRIPS_TABLE_NAME);
             database.execSQL(DROP_USER_TABLE);
+            database.execSQL(DROP_CATEGORY_TABLE);
         }
         catch (Exception e){
             Log.i("SQLITE DATABASE", "onUpgrade: " + e);

@@ -43,4 +43,6 @@ public class Constants {
     public static final String COLUMN_USER_NAME = "user_name";
     public static final String COLUMN_USER_EMAIL = "user_email";
     public static final String COLUMN_USER_PASSWORD = "user_password";
+    public static final String COLUMN_CATEGORY_ID = "category_id";
+    public static final String COLUMN_CATEGORY_NAME = "category_name";
 }

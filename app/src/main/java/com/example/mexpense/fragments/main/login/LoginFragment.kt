@@ -42,7 +42,7 @@ class LoginFragment : BaseMVVMFragment<FragmentLoginBinding, LoginViewModel>() {
             })
         }
 
-        viewBinding.signupText.setOnClickListener {
+        viewBinding.txtSignUpLink.setOnClickListener {
             it.findNavController().navigate(LoginFragmentDirections.actionLoginFragmentToRegisterFragment())
         }
     }

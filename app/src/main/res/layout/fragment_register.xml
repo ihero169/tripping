@@ -35,7 +35,8 @@
                 android:id="@+id/textInputLayoutEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                app:endIconMode="clear_text">
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -53,7 +54,8 @@
                 android:id="@+id/textInputLayoutName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                app:endIconMode="clear_text">
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -71,7 +73,8 @@
                 android:id="@+id/textInputLayoutPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                app:endIconMode="clear_text">
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -79,6 +82,7 @@
                     android:background="@drawable/custom_edittext"
                     android:drawablePadding="8dp"
                     android:hint="Password"
+                    android:inputType="textPassword"
                     android:padding="8dp"
                     android:textColor="@color/black_100"
                     android:textColorHighlight="@color/cardview_dark_background"
@@ -89,7 +93,8 @@
                 android:id="@+id/textInputLayoutRePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
+                android:layout_marginTop="10dp"
+                app:endIconMode="clear_text">
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
@@ -98,6 +103,7 @@
                     android:drawablePadding="8dp"
                     android:hint="Confirm Password"
                     android:padding="8dp"
+                    android:inputType="textPassword"
                     android:textColor="@color/black_100"
                     android:textColorHighlight="@color/cardview_dark_background"
                     android:layout_marginTop="40dp" />
